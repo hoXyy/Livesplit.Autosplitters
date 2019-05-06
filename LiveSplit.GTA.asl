@@ -5,6 +5,7 @@ state("Grand Theft Auto")
     int multiplier: 0x34F240;
     int InGame: 0x38513C;
     int InCutscene: "mss32.dll", 0x22E90;
+    int IsPaused: 0x3846B8;
 }
 
 startup
@@ -13,24 +14,15 @@ startup
 
 init
 {
-    vars.split = new List<int>();
+
 }
 
 split
 {
-    vars.doSplit = false;
-    
-    if (current.bigyellowtext == 1 && !vars.split.Contains(current.multiplier) && current.multiplier == old.multiplier+1) {
-        vars.split.Add(current.multiplier);
-        vars.doSplit = true;
-    }
-    
-    if (current.InCutscene != old.InCutscene) {
-        vars.doSplit = true;
-    }
-    
-    if (vars.doSplit)
-        return true;
+    return current.bigyellowtext == 1 &&
+           current.multiplier == old.multiplier+1 ||
+           current.InCutscene == 1 &&
+           current.InCutscene != old.InCutscene; 
 }
 
 start
@@ -42,5 +34,6 @@ start
 
 isLoading
 {
-    return current.InGame == 0;
+    return current.InGame == 0 ||
+           current.IsPaused == 1; 
 }
