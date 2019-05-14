@@ -1,3 +1,6 @@
+// GTA1, London 1969 & London 1961 autosplitter by hoxi
+// TODO: Proper statistics tracking, full London support
+
 state("Grand Theft Auto")
 {
     int score: 0x34F23C;
@@ -6,23 +9,281 @@ state("Grand Theft Auto")
     int InGame: 0x38513C;
     int InCutscene: "mss32.dll", 0x22E90;
     int IsPaused: 0x3846B8;
+    int RequiredScore: 0x2B3B84;
+    int SecretsAmount: 0x27638C;
+    int MissionsAmount: 0x2B3B78;
+    string30 CurrentDistrict: 0x2B3E30;
+}
+
+state("gta_uk")
+{
+    int score: 0x40D018;
+    int InCutscene: 0x10FFB0;
+    int InGame: 0x448C04;
+    int IsPaused: 0x448174;
+    string30 CurrentDistrict: 0x35CAB8;
+}
+
+state("gta_61")
+{
+    int score: 0x40EC20;
+    int IsPaused: 0x449D84;
+    int InGame: 0x4393B0;
+    int multiplier: 0x40EC24;
+    int InCutscene: 0x111438;
 }
 
 startup
 {
+    // game specific setting groups
+    settings.Add("GTA1", true, "GTA 1");
+    settings.Add("1969", true, "London 1969");
+    settings.Add("1961", true, "London 1961");
+
+    // main setting groups for GTA 1
+    settings.Add("RequiredScoreMetGTA1", true, "Required Score Met", "GTA1");
+    settings.SetToolTip("RequiredScoreMetGTA1", "Split when the required score to finish the chapter is met.");
+    settings.Add("DistrictFinishedGTA1", true, "Finished District", "GTA1");
+    settings.SetToolTip("DistrictFinishedGTA1", "Split when the finishing cutscene of the chapter is started.");
+    settings.Add("MissionPassGTA1", true, "Missions", "GTA1");
+    settings.SetToolTip("MissionPassGTA1", "Split on mission pass.");
+
+    // city specific groups (score met)
+    settings.Add("LCScore", true, "Liberty City", "RequiredScoreMetGTA1");
+    settings.Add("SAScore", true, "San Andreas", "RequiredScoreMetGTA1");
+    settings.Add("VCScore", true, "Vice City", "RequiredScoreMetGTA1");
+    
+    // Liberty City specific splits (score met)
+    settings.Add("LC1Score", true, "Gangsta Bang", "LCScore");
+    settings.Add("LC2Score", true, "Heist Almighty", "LCScore");
+
+    // San Andreas specific splits (score met)
+    settings.Add("SA1Score", true, "Mandarin Mayhem", "SAScore");
+    settings.Add("SA2Score", true, "Tequila Slammer", "SAScore");
+
+    // Vice City specific splits (score met)
+    settings.Add("VC1Score", true, "Bent Cop Blues", "VCScore");
+    settings.Add("VC2Score", true, "Rasta Blasta", "VCScore");
+
+    // city specific groups (district finished)
+    settings.Add("LCFinished", true, "Liberty City", "DistrictFinishedGTA1");
+    settings.Add("SAFinished", true, "San Andreas", "DistrictFinishedGTA1");
+    settings.Add("VCFinished", true, "Vice City", "DistrictFinishedGTA1");
+    
+    // Liberty City specific splits (district finished)
+    settings.Add("LC1Finished", true, "Gangsta Bang", "LCFinished");
+    settings.Add("LC2Finished", true, "Heist Almighty", "LCFinished");
+
+    // San Andreas specific splits (district finished)
+    settings.Add("SA1Finished", true, "Mandarin Mayhem", "SAFinished");
+    settings.Add("SA2Finished", true, "Tequila Slammer", "SAFinished");
+
+    // Vice City specific splits (district finished)
+    settings.Add("VC1Finished", true, "Bent Cop Blues", "VCFinished");
+    settings.Add("VC2Finished", true, "Rasta Blasta", "VCFinished");
+
+    // city specific groups (mission pass)
+    settings.Add("LCMission", true, "Liberty City", "MissionPassGTA1");
+    settings.Add("SAMission", true, "San Andreas", "MissionPassGTA1");
+    settings.Add("VCMission", true, "Vice City", "MissionPassGTA1");
+    
+    // Liberty City specific splits (mission pass)
+    settings.Add("LC1Mission", true, "Gangsta Bang", "LCMission");
+    settings.Add("LC2Mission", true, "Heist Almighty", "LCMission");
+
+    // San Andreas specific splits (mission pass)
+    settings.Add("SA1Mission", true, "Mandarin Mayhem", "SAMission");
+    settings.Add("SA2Mission", true, "Tequila Slammer", "SAMission");
+
+    // Vice City specific splits (mission pass)
+    settings.Add("VC1Mission", true, "Bent Cop Blues", "VCMission");
+    settings.Add("VC2Mission", true, "Rasta Blasta", "VCMission");  
+
+    // main setting groups for London 1969
+    settings.Add("RequiredScoreMet1969", true, "Required Score Met", "1969");
+    settings.SetToolTip("RequiredScoreMet1969", "Split when the required score to finish the chapter is met.");
+    settings.Add("DistrictFinished1969", true, "Finished District", "1969");
+    settings.SetToolTip("DistrictFinished1969", "Split when the finishing cutscene of the chapter is started.");
+    settings.Add("MissionPass1969", true, "Missions", "1969");
+    settings.SetToolTip("MissionPass1969", "Split on mission pass.");
+
+    // main setting groups for London 1961
+    settings.Add("RequiredScoreMet1961", true, "Required Score Met", "1961");
+    settings.SetToolTip("RequiredScoreMet1961", "Split when the required score to finish the chapter is met.");
+    settings.Add("DistrictFinished1961", true, "Finished District", "1961");
+    settings.SetToolTip("DistrictFinished1969", "Split when the finishing cutscene of the chapter is started.");
+    settings.Add("MissionPass1961", true, "Missions", "1961");
+    settings.SetToolTip("MissionPass1961", "Split on mission pass.");
+
 }
 
 init
 {
+    vars.doSplit = false;
+    vars.LC1ScoreMet = false;
+    vars.LC2ScoreMet = false;
+    vars.SA1ScoreMet = false;
+    vars.SA2ScoreMet = false;
+    vars.VC1ScoreMet = false;
+    vars.VC2ScoreMet = false;
+}
 
+update
+{
+    vars.doSplit = false;
+
+
+    if (settings["LC1Score"])
+    {
+        if ((!vars.LC1ScoreMet) && (current.score >= current.RequiredScore) && (current.CurrentDistrict == "Easy Liberty City NEW"))
+        {
+            vars.LC1ScoreMet = true;
+        }
+    }
+
+    if (settings["LC2Score"])
+    {
+        if ((!vars.LC2ScoreMet) && (current.score >= current.RequiredScore) && (current.CurrentDistrict == "Medium Liberty City new"))
+        {
+            vars.LC2ScoreMet = true;
+            vars.doSplit = true;
+        }
+    }
+
+    // using required score for VC1 and VC2 because they're both called "Vice is Painless" in the code
+    if (settings["VC1Score"])
+    {
+        if ((!vars.VC1ScoreMet) && (current.score >= current.RequiredScore) && (current.RequiredScore == 3000000))
+        {
+            vars.VC1ScoreMet = true;
+            vars.doSplit = true;
+        }
+    }
+
+    if (settings["VC2Score"])
+    {
+        if ((!vars.VC2ScoreMet) && (current.score >= current.RequiredScore) && (current.RequiredScore == 5000000))
+        {
+            vars.VC2ScoreMet = true;
+            vars.doSplit = true;
+        }
+    }
+
+    if (settings["SA1Score"]) 
+    {
+        if ((!vars.SA1ScoreMet) && (current.score >= current.RequiredScore) && (current.CurrentDistrict == "San Andreas medium"))
+        {
+            vars.SA1ScoreMet = true;
+            vars.doSplit = true;
+        }
+    }
+
+    if (settings["SA2Score"]) 
+    {
+        if ((!vars.SA2ScoreMet) && (current.score >= current.RequiredScore) && (current.CurrentDistrict == "San Andreas hard"))
+        {
+            vars.SA2ScoreMet = true;
+            vars.doSplit = true;
+        }
+    }
+
+    if (settings["LC1Finished"])
+    {
+        if ((current.CurrentDistrict == "Easy Liberty City NEW") && (current.InCutscene == 1) && (current.InCutscene != old.InCutscene) && (current.InCutscene != 0))
+        {
+            vars.doSplit = true;
+        }
+    }
+
+    if (settings["LC2Finished"])
+    {
+        if ((current.CurrentDistrict == "Medium Liberty City new") && (current.InCutscene == 1) && (current.InCutscene != old.InCutscene) && (current.InCutscene != 0))
+        {
+            vars.doSplit = true;
+        }
+    }
+
+    // using required score for VC1 and VC2 because they're both called "Vice is Painless" in the code
+    if (settings["VC1Finished"])
+    {
+        if ((current.RequiredScore == 3000000) && (current.InCutscene == 1) && (current.InCutscene != old.InCutscene) && (current.InCutscene != 0))
+        {
+            vars.doSplit = true;
+        }
+    }
+
+    if (settings["VC2Finished"])
+    {
+        if ((current.RequiredScore == 5000000) && (current.InCutscene == 1) && (current.InCutscene != old.InCutscene) && (current.InCutscene != 0))
+        {
+            vars.doSplit = true;
+        }
+    }
+
+    if (settings["SA1Finished"])
+    {
+        if ((current.CurrentDistrict == "San Andreas medium") && (current.InCutscene == 1) && (current.InCutscene != old.InCutscene) && (current.InCutscene != 0))
+        {
+            vars.doSplit = true;
+        }        
+    }
+
+    if (settings["SA2Finished"])
+    {
+        if ((current.CurrentDistrict == "San Andreas hard") && (current.InCutscene == 1) && (current.InCutscene != old.InCutscene) && (current.InCutscene != 0))
+        {
+            vars.doSplit = true;
+        }        
+    }
+
+    if (settings["LC1Mission"])
+    {
+        if ((current.CurrentDistrict == "Easy Liberty City NEW") && (current.bigyellowtext == 1) && (current.multiplier == old.multiplier+1))
+        {
+            vars.doSplit = true;
+        }
+    }
+    if (settings["LC2Mission"])
+    {
+        if ((current.CurrentDistrict == "Medium Liberty City new") && (current.bigyellowtext == 1) && (current.multiplier == old.multiplier+1))
+        {
+            vars.doSplit = true;
+        }
+    }
+    if (settings["VC1Mission"])
+    {
+        if ((current.RequiredScore == 3000000) && (current.bigyellowtext == 1) && (current.multiplier == old.multiplier+1))
+        {
+            vars.doSplit = true;
+        }
+    }
+    if (settings["VC2Mission"])
+    {
+        if ((current.RequiredScore == 5000000) && (current.bigyellowtext == 1) && (current.multiplier == old.multiplier+1))
+        {
+            vars.doSplit = true;
+        }
+    }
+    if (settings["SA1Mission"])
+    {
+        if ((current.CurrentDistrict == "San Andreas medium") && (current.bigyellowtext == 1) && (current.multiplier == old.multiplier+1))
+        {
+            vars.doSplit = true;
+        }
+    }
+    if (settings["SA2Mission"])
+    {
+        if ((current.CurrentDistrict == "San Andreas hard") && (current.bigyellowtext == 1) && (current.multiplier == old.multiplier+1))
+        {
+            vars.doSplit = true;
+        }
+    }
+   
 }
 
 split
 {
-    return current.bigyellowtext == 1 &&
-           current.multiplier == old.multiplier+1 ||
-           current.InCutscene == 1 &&
-           current.InCutscene != old.InCutscene; 
+    return vars.doSplit;      
 }
 
 start
