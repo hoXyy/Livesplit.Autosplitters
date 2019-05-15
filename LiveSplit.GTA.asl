@@ -186,7 +186,7 @@ update
 
     if ((vars.MultiplierTriggered == 1) && (vars.BigTextTriggered == 1))
     {
-        if ((vars.LastMultiplier - vars.LastBigText <= 2500) & (vars.LastMultiplier - vars.LastBigText > 0))
+        if ((vars.LastMultiplier - vars.LastBigText <= 5500) & (vars.LastMultiplier - vars.LastBigText > 0))
         {
             vars.doMissionSplit = 1;
         }
