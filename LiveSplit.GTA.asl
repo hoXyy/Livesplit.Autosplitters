@@ -1,5 +1,5 @@
 // GTA1, London 1969 & London 1961 autosplitter by hoxi
-// TODO: Proper statistics tracking, full London support
+// TODO: Proper statistics tracking
 
 state("Grand Theft Auto")
 {
