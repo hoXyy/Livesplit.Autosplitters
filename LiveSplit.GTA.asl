@@ -1,7 +1,7 @@
 // GTA1, London 1969 & London 1961 autosplitter by hoxi
 // TODO: Proper statistics tracking
 
-state("Grand Theft Auto")
+state("Grand Theft Auto", "Rockstar Classics")
 {
     int score: 0x34F23C;
     int bigyellowtext: 0x384864;
@@ -13,6 +13,48 @@ state("Grand Theft Auto")
     int SecretsAmount: 0x27638C;
     int MissionsAmount: 0x2B3B78;
     string30 CurrentDistrict: 0x2B3E30;
+}
+
+state("gtawin", "Rockstar Classics")
+{
+    int score: 0x34F23C;
+    int bigyellowtext: 0x384864;
+    int multiplier: 0x34F240;
+    int InGame: 0x38513C;
+    int InCutscene: "mss32.dll", 0x22E90;
+    int IsPaused: 0x3846B8;
+    int RequiredScore: 0x2B3B84;
+    int SecretsAmount: 0x27638C;
+    int MissionsAmount: 0x2B3B78;
+    string30 CurrentDistrict: 0x2B3E30;
+}
+
+state("Grand Theft Auto", "Retail")
+{
+    int score: 0x2576B8;
+    int bigyellowtext: 0x278DC8;
+    int multiplier: 0x2576BC;
+    int InGame: 0x277EF4;
+    int InCutscene: "mss32.dll", 0x22E90;
+    int IsPaused: 0x27838C;
+    int RequiredScore: 0x336A20;
+    int SecretsAmount: 0x2FB934;
+    int MissionsAmount: 0x336A10;
+    string30 CurrentDistrict: 0x1FF7D8;
+}
+
+state("gtawin", "Retail")
+{
+    int score: 0x2576B8;
+    int bigyellowtext: 0x278DC8;
+    int multiplier: 0x2576BC;
+    int InGame: 0x277EF4;
+    int InCutscene: "mss32.dll", 0x22E90;
+    int IsPaused: 0x27838C;
+    int RequiredScore: 0x336A20;
+    int SecretsAmount: 0x2FB934;
+    int MissionsAmount: 0x336A10;
+    string30 CurrentDistrict: 0x1FF7D8;
 }
 
 state("gta_uk")
@@ -142,7 +184,6 @@ startup
     settings.SetToolTip("MissionPass1961", "Split on mission pass.");
 
     // London 1961 has only one chapter, therefore making chapter specific splits is redundant 
-
 }
 
 init
@@ -165,10 +206,33 @@ init
     vars.LastBigText = 0;
     vars.LastMultiplier = 0;
     vars.doMissionSplit = 0;
+
+    // Version checking
+    if ((int)modules.First().BaseAddress == 0x400000)
+    {
+        if ((int)modules.First().ModuleMemorySize == 0x39E000)
+        {
+            version = "Retail";
+        }
+        else if ((int)modules.First().ModuleMemorySize == 0x392000)
+        {
+            version = "Rockstar Classics";
+        }
+    }
+    else
+    {
+        version = "";
+    }
 }
 
 update
 {
+    if (version == "")
+    {
+        return false;
+        print("AUTOSPLITTER DISABLED");
+    }
+    
     // Mission splitting logic
     vars.doSplit = false;
 
