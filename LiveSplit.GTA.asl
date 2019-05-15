@@ -192,13 +192,15 @@ update
         }
     }
 
-    // GTA 1 splits
+
 
     if (vars.doMissionSplit == 1)
     {
         vars.MultiplierTriggered = 0;
         vars.BigTextTriggered = 0;        
     }
+
+    // GTA 1 splits
 
     if (settings["LC1Score"])
     {
