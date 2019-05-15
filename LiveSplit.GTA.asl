@@ -1,5 +1,5 @@
 // GTA1, London 1969 & London 1961 autosplitter by hoxi
-// TODO: Proper statistics tracking
+// TODO: Proper statistics tracking, full London support
 
 state("Grand Theft Auto")
 {
@@ -186,7 +186,7 @@ update
 
     if ((vars.MultiplierTriggered == 1) && (vars.BigTextTriggered == 1))
     {
-        if (vars.LastMultiplier - vars.LastBigText <= 5500)
+        if ((vars.LastMultiplier - vars.LastBigText <= 5500) & (vars.LastMultiplier - vars.LastBigText > 0))
         {
             vars.doMissionSplit = 1;
         }
