@@ -9,6 +9,9 @@ state("sr2_pc", "Steam")
     int barnstorming : 0x1053670;
     string255 cutscene : 0x02127D10, 0x4, 0x0;
     int startFlag : 0x1F870C0;
+    // Thanks Mr. Mary for finding these 2 addresses
+	int cutsceneLoad : 0xA9D670;
+	bool saveLoad : 0xA8EB88;    
 }
 
 state("sr2_pc", "GOG")
@@ -22,6 +25,8 @@ state("sr2_pc", "GOG")
     int barnstorming : 0x1053670;
     string255 cutscene : 0x02127D10, 0x4, 0x0;
     int startFlag : 0x1F870A0;
+	int cutsceneLoad : 0xA9D670;
+	bool saveLoad : 0xA8EB88;    
 }
 
 startup
@@ -150,4 +155,9 @@ split
 reset
 {
     return vars.LastCutscene == "TSSP-INTRO2.cscx";
+}
+
+isLoading
+{
+    return current.cutsceneLoad == 0 || !current.saveLoad;
 }
