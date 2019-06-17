@@ -50,7 +50,7 @@ startup
     settings.Add("jumps", false, "Stunt Jumps");
     settings.Add("barnstorming", false, "Barnstorming");
     settings.Add("race", false, "Races (experimental)");
-    settings.SetToolTip("race", "Splits once you exit or finish a race.");
+    settings.SetToolTip("race", "Splits once you exit or finish a race. (NOTE: Could randomly split in other places.)");
 }
 
 init
