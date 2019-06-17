@@ -136,7 +136,7 @@ split
 
     if (settings["activities"])
     {
-        if (current.onActivity == 0 && old.onActivity == 4)
+        if (current.activities == old.activities+1)
         {
             return true;
         }
