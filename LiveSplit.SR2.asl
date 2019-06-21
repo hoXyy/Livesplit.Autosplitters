@@ -36,6 +36,7 @@ startup
     settings.Add("main", true, "Main");
     settings.Add("collectibles", false, "Collectibles");
     settings.Add("misc", false, "Misc");
+    settings.Add("experimental", false, "Experimental features");
 
     settings.CurrentDefaultParent = "main";
     settings.Add("missions", true, "Missions");
@@ -46,10 +47,12 @@ startup
     settings.Add("cd", false, "CDs");
 
     settings.CurrentDefaultParent = "misc";
-    settings.Add("activities", false, "Activities");
     settings.Add("jumps", false, "Stunt Jumps");
     settings.Add("barnstorming", false, "Barnstorming");
-    settings.Add("race", false, "Races (experimental)");
+
+    settings.CurrentDefaultParent = "experimental";
+    settings.Add("activities", false, "Activities");    
+    settings.Add("race", false, "Races");
     settings.SetToolTip("race", "Splits once you exit or finish a race. (NOTE: Could randomly split in other places.)");
 }
 
