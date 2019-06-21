@@ -10,8 +10,8 @@ state("sr2_pc", "Steam")
     string255 cutscene : 0x02127D10, 0x4, 0x0;
     int startFlag : 0x1F870C0;
     // Thanks Mr. Mary for finding these 2 addresses
-	int cutsceneLoad : 0xA9D670;
-	bool saveLoad : 0xA8EB88;
+    int cutsceneLoad : 0xA9D670;
+    bool saveLoad : 0xA8EB88;
     bool inRace : 0x25E3F34;           
 }
 
@@ -26,8 +26,8 @@ state("sr2_pc", "GOG")
     int barnstorming : 0x1053670;
     string255 cutscene : 0x02127D10, 0x4, 0x0;
     int startFlag : 0x1F870A0;
-	int cutsceneLoad : 0xA9D670;
-	bool saveLoad : 0xA8EB88;  
+    int cutsceneLoad : 0xA9D670;
+    bool saveLoad : 0xA8EB88;  
     bool inRace : 0x25E3F34;   
 }
 
