@@ -59,7 +59,7 @@ startup
     settings.Add("barnstorming", false, "Barnstorming");
 
     settings.CurrentDefaultParent = "experimental";
-    settings.Add("activities", false, "Activities");    
+    //settings.Add("activities", false, "Activities");    
     settings.Add("race", false, "Races");
     settings.SetToolTip("race", "Splits once you exit or finish a race. (NOTE: Could randomly split in other places.)");
 }
@@ -145,13 +145,13 @@ split
         }
     }
 
-    if (settings["activities"])
-    {
-        if (current.activities == old.activities+1)
-        {
-            return true;
-       }
-    }
+    //if (settings["activities"])
+    //{
+    //    if (current.activities == old.activities+1)
+    //    {
+    //        return true;
+    //    }
+    //}
 
     if (settings["jumps"])
     {
