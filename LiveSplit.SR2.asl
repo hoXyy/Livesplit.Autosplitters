@@ -1,4 +1,4 @@
-// TODO: Add Stronghold settings
+
 state("sr2_pc", "Steam")
 {
     // mission addresses
@@ -93,13 +93,6 @@ startup
     settings.Add("jumps", false, "Stunt Jumps");
     settings.Add("barnstorming", false, "Barnstorming");
 
-    settings.CurrentDefaultParent = "missions";
-    settings.Add("saintsMissions", true, "Third Street Saints");
-    settings.Add("brotherhoodMissions", true, "The Brotherhood");
-    settings.Add("roninMissions", true, "The Ronin");
-    settings.Add("samediMissions", true, "Sons of Samedi");
-    settings.Add("ultorMissions", true, "Ultor");    
-
     vars.activities = new Dictionary<string, string>{
         {"chopshop", "Chop Shop"},
         {"crowdcontrol", "Crowd Control"},
@@ -120,96 +113,7 @@ startup
 
 	foreach (var Script in vars.activities) {
 		settings.Add(Script.Key, true, Script.Value, "activities");
-	} 
-
-    vars.saintsMissions = new Dictionary<string, string> {
-        {"TSSP01-02.cscx", "Jailbreak"},
-        {"TSSP02-02.cscx", "Appointed Defender"},
-        {"TSSP03-02.cscx", "Down Payment"},
-        {"TSSP04-02.cscx", "Three Kings"}
-    };
-
-	// Add Saints mission list
-	vars.missionsList = new List<string>();
-
-	foreach (var Script in vars.saintsMissions) {
-		settings.Add(Script.Key, true, Script.Value, "saintsMissions");
-		vars.missionsList.Add(Script.Key); 
-	}	    
-
-    vars.brotherhoodMissions = new Dictionary<string, string>{
-        {"BR01-02.cscx", "First Impressions"},
-        {"BR02-02.cscx", "Reunion Tour"},
-        {"BR03-02.cscx", "Waste Not Want Not"},
-        {"BR04-02.cscx", "Red Asphalt"},
-        {"BR05-02.cscx", "Bank Error in Your Favor"},
-        {"BR06-02.cscx", "Thank you and Goodnight!"},
-        {"BR07-02.cscx", "Retribution"},
-        {"BR08-02.cscx", "Jail Bait"},
-        {"BR09-02.cscx", "The Enemy of My Enemy"},
-        {"BR10-02.cscx", "The Siege"},
-        {"BR11-02.cscx", "Showdown"}
-    }; 
-
-
-	foreach (var Script in vars.brotherhoodMissions) {
-		settings.Add(Script.Key, true, Script.Value, "brotherhoodMissions");
-		vars.missionsList.Add(Script.Key); 
-	}
-
-    vars.roninMissions = new Dictionary<string, string>{
-        {"RO01-02.cscx", "Saint's Seven"},
-        {"RO02-02.cscx", "Laundry Day"},
-        {"RO03-02.cscx", "Road Rage"},
-        {"RO04-02.cscx", "Bleeding Out"},
-        {"RO05-02.cscx", "Orange Threat Level"},
-        {"RO06-02.cscx", "Kanto Connection"},
-        {"RO07-02.cscx", "Visiting Hours"},
-        {"RO08-02.cscx", "Room Service"},
-        {"RO09-02.cscx", "Rest in Peace"},
-        {"RO10-02.cscx", "Good D"},
-        {"RO11-02.cscx", "One Man's Junk..."}
-    };
-
-
-	foreach (var Script in vars.roninMissions) {
-		settings.Add(Script.Key, true, Script.Value, "roninMissions");
-		vars.missionsList.Add(Script.Key); 
-	}
-
-    vars.samediMissions = new Dictionary<string, string>{
-        {"SS01-02.cscx", "Got Dust, Will Travel"},
-        {"SS02-02.cscx", "File in the Cake"},
-        {"SS03-02.cscx", "Airborne Assault"},
-        {"SS04-02.cscx", "Veteran Child"},
-        {"SS05-02.cscx", "Burning Down the House"},
-        {"SS06-02.cscx", "Bad Trip"},
-        {"SS07-02.cscx", "Bonding Experience"},
-        {"SS08-02.cscx", "Riot Control"},
-        {"SS09-02.cscx", "Eternal Sunshine"},
-        {"SS10-02.cscx", "Assault on Precinct 31"},
-        {"SS11-02.cscx", "The Shopping Maul"}
-    }; 
-
-
-	foreach (var Script in vars.samediMissions) {
-		settings.Add(Script.Key, true, Script.Value, "samediMissions");
-		vars.missionsList.Add(Script.Key); 
-	}  
-
-    vars.ultorMissions = new Dictionary<string, string>{
-        {"TSSE01-02.cscx", "Picking a Fight"},
-        {"TSSE02-02.cscx", "Pyramid Scheme"},
-        {"TSSE03-02.cscx", "Salting the Earth...Again"},
-        {"TSSE04-02.cscx", "... and a Better Life"},
-        {"BON02.cscx", "Revelation"}
-    };
-
-
-	foreach (var Script in vars.ultorMissions) {
-		settings.Add(Script.Key, true, Script.Value, "ultorMissions");
-		vars.missionsList.Add(Script.Key); 
-	}                        
+	}     
 }
 
 init
@@ -262,13 +166,12 @@ start
 split
 {
 
-	if (current.missions == old.missions+1)  
+	if (settings["missions"]) 
 	{
-		if (vars.missionsList.Contains(vars.LastCutscene) && settings[vars.LastCutscene] && !vars.missionSplits.Contains(vars.LastCutscene))
-		{
-			vars.missionSplits.Add(vars.LastCutscene);
-			return true;
-		}		
+        if (current.missions == old.missions+1)
+        {
+            return true;
+        } 
 	}
 
     if (settings["strongholds"])
