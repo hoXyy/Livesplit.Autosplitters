@@ -4,7 +4,6 @@ state("sr2_pc", "Steam")
     // mission addresses
     int missions : 0x1053384;
     int strongholds : 0x10533C8;
-    int activities : 0x105340C;
 
     // collectibles addresses 
     int tags : 0x10535E8;
@@ -43,7 +42,6 @@ state("sr2_pc", "GOG")
     // mission addresses
     int missions : 0x1053384;
     int strongholds : 0x10533C8;
-    int activities : 0x105340C;
 
     // collectibles addresses 
     int tags : 0x10535E8;
@@ -196,14 +194,6 @@ split
         {
             return true;
         }
-    }
-
-    if (settings["activities"])
-    {
-        if (current.activities == old.activities+1)
-        {
-            return true;
-       }
     }
 
     if (settings["jumps"])
