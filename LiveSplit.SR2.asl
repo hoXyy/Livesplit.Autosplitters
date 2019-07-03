@@ -32,6 +32,7 @@ state("sr2_pc", "Steam")
     // other addresses
     string255 cutscene : 0x02127D10, 0x4, 0x0;
     int startFlag : 0x1F870C0;
+    int percent : 0x1052C58;
     // Thanks Mr. Mary for finding these 2 addresses
     int cutsceneLoad : 0xA9D670;
     bool saveLoad : 0xA8EB88;          
@@ -70,6 +71,7 @@ state("sr2_pc", "GOG")
     // other addresses
     string255 cutscene : 0x02127D10, 0x4, 0x0;
     int startFlag : 0x1F870A0;
+    int percent : 0x1052C58;
     // Thanks Mr. Mary for finding these 2 addresses
     int cutsceneLoad : 0xA9D670;
     bool saveLoad : 0xA8EB88;    
@@ -84,6 +86,8 @@ startup
     settings.CurrentDefaultParent = "main";
     settings.Add("missions", true, "Missions");
     settings.Add("strongholds", true, "Strongholds");
+    settings.Add("100", false, "100% Completion");
+    settings.SetToolTip("100", "Splits once you reach 100% completion.")
 
     settings.CurrentDefaultParent = "collectibles";
     settings.Add("tags", false, "Tags");
@@ -175,6 +179,14 @@ split
     if (settings["strongholds"])
     {
         if (current.strongholds == old.strongholds+1)
+        {
+            return true;
+        }
+    }
+
+    if (settings["100"])
+    {
+        if (current.percent == 100 && current.percent != old.percent)
         {
             return true;
         }
