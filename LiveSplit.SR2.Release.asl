@@ -87,7 +87,7 @@ startup
     settings.Add("missions", true, "Missions");
     settings.Add("strongholds", true, "Strongholds");
     settings.Add("100", false, "100% Completion");
-    settings.SetToolTip("100", "Splits once you reach 100% completion.")
+    settings.SetToolTip("100", "Splits once you reach 100% completion.");
 
     settings.CurrentDefaultParent = "collectibles";
     settings.Add("tags", false, "Tags");
