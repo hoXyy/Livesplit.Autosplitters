@@ -556,9 +556,3 @@ start
            current.multiplier == 1 &&
            current.score == 0; 
 }
-
-isLoading
-{
-    return current.InGame == 0 ||
-           current.IsPaused == 1; 
-}
