@@ -330,7 +330,7 @@ split
 
     if (settings["snatch"])
     {
-        if (current.snatch == old.septic+1)
+        if (current.snatch == old.snatch+1)
         {
             return true;
         }
