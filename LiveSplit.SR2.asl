@@ -1,35 +1,6 @@
 
 state("sr2_pc", "Steam")
 {
-    // mission addresses
-    int missions : 0x1053384;
-    int strongholds : 0x10533C8;
-
-    // collectibles addresses 
-    int tags : 0x10535E8;
-    int cd : 0x27C7150;
-    int jumps : 0x10535A4;
-    int barnstorming : 0x1053670;
-
-
-    // activities addresses
-    int races : 0x1055760;
-    int trafficking : 0x1053918;
-    int fraud : 0x1053D14;
-    int snatch : 0x1054000;
-    int derby : 0x1053890;
-    int escort : 0x10539A0;
-    int trailblazing : 0x1053C04;
-    int mayhem : 0x1053E68;
-    int fuzz : 0x1053AB0; 
-    int crowdcontrol : 0x10537C4;
-    int chopshop : 0x10536B4;
-    int hitman : 0x10536F8;
-    int fightclub: 0x1053A28;
-    int septic : 0x1053F34;
-    int heliassault : 0x1053B38;   
-
-    // other addresses
     string255 cutscene : 0x02127D10, 0x4, 0x0;
     int startFlag : 0x1F870C0;
     int percent : 0x1052C58;
@@ -40,35 +11,6 @@ state("sr2_pc", "Steam")
 
 state("sr2_pc", "GOG")
 {
-    // mission addresses
-    int missions : 0x1053384;
-    int strongholds : 0x10533C8;
-
-    // collectibles addresses 
-    int tags : 0x10535E8;
-    int cd : 0x27C7150;
-    int jumps : 0x10535A4;
-    int barnstorming : 0x1053670;
-
-
-    // activities addresses
-    int races : 0x1055760;
-    int trafficking : 0x1053918;
-    int fraud : 0x1053D14;
-    int snatch : 0x1054000;
-    int derby : 0x1053890;
-    int escort : 0x10539A0;
-    int trailblazing : 0x1053C04;
-    int mayhem : 0x1053E68;
-    int fuzz : 0x1053AB0; 
-    int crowdcontrol : 0x10537C4;
-    int chopshop : 0x10536B4;
-    int hitman : 0x10536F8;
-    int fightclub: 0x1053A28;
-    int septic : 0x1053F34;
-    int heliassault : 0x1053B38;   
-
-    // other addresses
     string255 cutscene : 0x02127D10, 0x4, 0x0;
     int startFlag : 0x1F870A0;
     int percent : 0x1052C58;
@@ -84,43 +26,65 @@ startup
     settings.Add("collectibles", false, "Collectibles");
 
     settings.CurrentDefaultParent = "main";
-    settings.Add("missions", true, "Missions");
-    settings.Add("strongholds", true, "Strongholds");
+    settings.Add("iMissions", true, "Missions");
+    settings.Add("iStrongholds", true, "Strongholds");
     settings.Add("100", false, "100% Completion");
     settings.SetToolTip("100", "Splits once you reach 100% completion.");
 
     settings.CurrentDefaultParent = "collectibles";
-    settings.Add("tags", false, "Tags");
-    settings.Add("cd", false, "CDs");
-    settings.Add("jumps", false, "Stunt Jumps");
-    settings.Add("barnstorming", false, "Barnstorming");
+    settings.Add("iTags", false, "Tags");
+    settings.Add("iCD", false, "CDs");
+    settings.Add("iJumps", false, "Stunt Jumps");
+    settings.Add("iBarnstorming", false, "Barnstorming");
 
-    vars.activities = new Dictionary<string, string>{
-        {"chopshop", "Chop Shop"},
-        {"crowdcontrol", "Crowd Control"},
-        {"derby", "Demolition Derby"},
-        {"trafficking", "Drug Trafficking"},
-        {"escort", "Escort"},
-        {"fightclub", "Fight Club"},
-        {"fuzz", "FUZZ"},
-        {"heliassault", "Heli Assault"},
-        {"hitman", "Hitman"},
-        {"fraud", "Insurance Fraud"},
-        {"mayhem", "Mayhem"},
-        {"races", "Races"},
-        {"septic", "Septic Avenger"},
-        {"snatch", "Snatch"},
-        {"trailblazing", "Trail Blazing"}
+    settings.CurrentDefaultParent = "activities";
+    settings.Add("iChopShop", true, "Chop Shop");
+    settings.Add("iCrowdControl", true, "Crowd Control");
+    settings.Add("iDerby", true, "Destruction Derby");
+    settings.Add("iEscort", true, "Escort");
+    settings.Add("iFightClub", true, "Fight Club");
+    settings.Add("iFuzz", true, "FUZZ");
+    settings.Add("iHeliAssault", true, "Heli Assault");
+    settings.Add("iHitman", true, "Hitman");
+    settings.Add("iFraud", true, "Insurance Fraud");
+    settings.Add("iMayhem", true, "Mayhem");
+    settings.Add("iRaces", true, "Races");
+    settings.Add("iSeptic", true, "Septic Avenger");
+    settings.Add("iSnatch", true, "Snatch");
+    settings.Add("iTrafficking", true, "Trafficking");
+    settings.Add("iTrailBlazing", true, "Trail Blazing");
+
+
+    vars.addresses = new Dictionary<string, int>{
+        {"iMissions", 0x1053384},
+        {"iStrongholds", 0x10533C8},
+        {"iTags", 0x10535E8},
+        {"iCD", 0x27C7150},
+        {"iJumps", 0x10535A4},
+        {"iBarnstorming", 0x1053670},
+        {"iChopShop", 0x10536B4},
+        {"iCrowdcontrol", 0x10537C4},
+        {"iDerby", 0x1053890},
+        {"iEscort", 0x10539A0},
+        {"iFightClub", 0x1053A28},
+        {"iFuzz", 0x1053AB0},
+        {"iHeliAssault", 0x1053B38},
+        {"iHitman", 0x10536F8},
+        {"iFraud", 0x1053D14},
+        {"iMayhem", 0x1053E68},
+        {"iRaces", 0x1055760},
+        {"iSeptic", 0x1053F34},
+        {"iSnatch", 0x1054000},
+        {"iTrafficking", 0x1053918},
+        {"iTrailBlazing", 0x1053C04}
     };
-
-	foreach (var Script in vars.activities) {
-		settings.Add(Script.Key, true, Script.Value, "activities");
-	}     
+   
 }
 
 init
 {
-   //timer.IsGameTimePaused = false;
+	// Create new empty MemoryWatcherList
+	vars.memoryWatchers = new MemoryWatcherList();
 
     if ((int)modules.First().BaseAddress == 0x400000)
     {
@@ -138,6 +102,16 @@ init
         version = "";
     }    
 
+
+	// MemoryWatcher wrapper
+	Action<string, int> mw = (name, address) => {
+		vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer("sr2_pc.exe", address)){ Name = name }); 
+	};
+
+    foreach (var a in vars.addresses) {
+        mw(a.Key, a.Value);
+    }
+
     vars.LastCutscene = null;
 }
 
@@ -153,6 +127,8 @@ update
         vars.LastCutscene = current.cutscene;
     }
 
+	// Update all MemoryWatchers
+	vars.memoryWatchers.UpdateAll(game);
 
 
 }
@@ -167,23 +143,7 @@ start
 
 split
 {
-
-	if (settings["missions"]) 
-	{
-        if (current.missions == old.missions+1)
-        {
-            return true;
-        } 
-	}
-
-    if (settings["strongholds"])
-    {
-        if (current.strongholds == old.strongholds+1)
-        {
-            return true;
-        }
-    }
-
+    // 100% split
     if (settings["100"])
     {
         if (current.percent == 100 && current.percent != old.percent)
@@ -192,157 +152,15 @@ split
         }
     }
 
-    if (settings["tags"])
-    {
-        if (current.tags == old.tags+1)
-        {
-            return true;
-        }
-    }
+    foreach (var mw in vars.memoryWatchers)  {
+        var name = mw.Name;
 
-    if (settings["cd"])
-    {
-        if (current.cd == old.cd+1)
-        {
-            return true;
+        if (settings.ContainsKey(name) && settings[name]) {
+            if (mw.Current == mw.Old + 1) {
+                return true;
+            }
         }
-    }
-
-    if (settings["jumps"])
-    {
-        if (current.jumps == old.jumps+1)
-        {
-            return true;
-        }
-    }
-
-    if (settings["barnstorming"])
-    {
-        if (current.barnstorming == old.barnstorming+1)
-        {
-            return true;
-        }
-    }
-
-    if (settings["chopshop"])
-    {
-        if (current.chopshop == old.chopshop+1)
-        {
-            return true;
-        }
-    }
-
-    if (settings["crowdcontrol"])
-    {
-        if (current.crowdcontrol == old.crowdcontrol+1)
-        {
-            return true;
-        }
-    }
-
-    if (settings["derby"])
-    {
-        if (current.derby == old.derby+1)
-        {
-            return true;
-        }
-    }
-
-    if (settings["trafficking"])
-    {
-        if (current.trafficking == old.trafficking+1)
-        {
-            return true;
-        }
-    }
-
-    if (settings["escort"])
-    {
-        if (current.escort == old.escort+1)
-        {
-            return true;
-        }
-    }
-
-    if (settings["fightclub"])
-    {
-        if (current.fightclub == old.fightclub+1)
-        {
-            return true;
-        }
-    }
-
-    if (settings["fuzz"])
-    {
-        if (current.fuzz == old.fuzz+1)
-        {
-            return true;
-        }
-    }  
-
-    if (settings["heliassault"])
-    {
-        if (current.heliassault == old.heliassault+1)
-        {
-            return true;
-        }
-    }
-
-    if (settings["hitman"])
-    {
-        if (current.hitman == old.hitman+1)
-        {
-            return true;
-        }
-    }
-
-    if (settings["fraud"])
-    {
-        if (current.fraud == old.fraud+1)
-        {
-            return true;
-        }
-    }
-
-    if (settings["mayhem"])
-    {
-        if (current.mayhem == old.mayhem+1)
-        {
-            return true;
-        }
-    }
-
-    if (settings["races"])
-    {
-        if (current.races == old.races+1)
-        {
-            return true;
-        }
-    }
-
-    if (settings["septic"])
-    {
-        if (current.septic == old.septic+1)
-        {
-            return true;
-        }
-    }
-
-    if (settings["snatch"])
-    {
-        if (current.snatch == old.snatch+1)
-        {
-            return true;
-        }
-    }
-
-    if (settings["trailblazing"])
-    {
-        if (current.trailblazing == old.trailblazing+1)
-        {
-            return true;
-        }
-    }                
+    }             
 }
 
 reset
@@ -355,7 +173,3 @@ isLoading
     return current.cutsceneLoad == 0 || !current.saveLoad;
 }
 
-//exit
-//{
-//    timer.IsGameTimePaused = true;
-//}
