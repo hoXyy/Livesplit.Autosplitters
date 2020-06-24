@@ -21,7 +21,7 @@ state("sr2_pc", "GOG")
 
 startup
 {
-    vars.aslName = "Saints Row: The Third Autosplitter";
+    vars.aslName = "Saints Row 2 Autosplitter";
     if(timer.CurrentTimingMethod == TimingMethod.RealTime)
         {
             var timingMessage = MessageBox.Show(
