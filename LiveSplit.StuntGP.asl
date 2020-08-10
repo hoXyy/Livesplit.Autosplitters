@@ -1,31 +1,30 @@
 // Stunt GP autosplitter, made per request
 // Supports original International version and Polish version
-// Bugs anyone is free to figure out: timer starts when moving around menus because of values changing during fades
 
 state("StuntGP_D3D", "International - DirectX")
 {
-    int menuState: 0x1DABB0;
+    int menuState: 0x1FF320;
     bool raceFinish: 0xC1A8C;
     float timer: 0xBA240;
 }
 
 state("StuntGP_Glide", "International - Glide")
 {
-    int menuState: 0x194EC8;
+    int menuState: 0x1B9638;
     bool raceFinish: 0x96AF0;
     float timer: 0xB1190;
 }
 
 state("StuntGP_D3D", "Polish - DirectX")
 {
-    int menuState: 0x1DA194;
+    int menuState: 0x1FE900;
     bool raceFinish: 0xA31AC;
     float timer: 0xAA7C8;
 }
 
 state("StuntGP_Glide", "Polish - Glide")
 {
-    int menuState: 0x1944BC;
+    int menuState: 0x1B8C28;
     bool raceFinish: 0xB06B8;
     float timer: 0xB0590;
 }
@@ -63,18 +62,22 @@ init
 
     print(version);
 
-    vars.menuStates = new List<int>();
-    vars.menuStates.Add(1117257728);
-    vars.menuStates.Add(1113587712);
-    vars.menuStates.Add(1);
 }
 
 start
 {
-    return current.menuState != old.menuState && vars.menuStates.Contains(current.menuState); 
+    // start after single player menu, don't start by going back to main menu
+    return current.menuState != old.menuState && old.menuState == 692 && current.menuState != 468 ;
 }
 
 split
 {
+    // split on finish line
     return current.raceFinish && !old.raceFinish && current.timer > 0;
+}
+
+reset
+{
+    // reset when entering single player menu
+    return  current.menuState != old.menuState && current.menuState == 692;
 }
