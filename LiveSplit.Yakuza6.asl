@@ -5,7 +5,7 @@ state("Yakuza6", "Game Pass - Launch Version")
 
 state("Yakuza6", "Steam - 12/04/2021 Version")
 {
-	bool isLoad: 0x025F5240, 0x1C4;
+    bool isLoad: 0x025F5240, 0x1C4;
 }
 
 state("Yakuza6", "Steam - Launch Version") 
@@ -18,7 +18,7 @@ init
 	switch (modules.First().ModuleMemorySize)
 	{
 		case 60669952:
-			version = "Steam - 12/04/2021 Version"
+			version = "Steam - 12/04/2021 Version";
 			break;
 		case 62529536:
 			version = "Game Pass - Launch Version";
