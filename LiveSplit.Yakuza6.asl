@@ -3,7 +3,7 @@ state("Yakuza6", "Game Pass - Launch Version")
     bool isLoad: 0x027DDB20, 0x1C4;
 }
 
-state("Yakuza6", "Steam - 12/04/2021 Version")
+state("Yakuza6", "Steam - 12.04.2021/21.04.2021 Version")
 {
     bool isLoad: 0x025F5240, 0x1C4;
 }
