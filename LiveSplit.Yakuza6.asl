@@ -18,7 +18,7 @@ init
 	switch (modules.First().ModuleMemorySize)
 	{
 		case 60669952:
-			version = "Steam - 12/04/2021 Version";
+			version = "Steam - 12.04.2021/21.04.2021 Version";
 			break;
 		case 62529536:
 			version = "Game Pass - Launch Version";
