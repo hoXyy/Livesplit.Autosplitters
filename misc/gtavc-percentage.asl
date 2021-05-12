@@ -33,7 +33,7 @@ init {
 }
 
 update {
-    vars.textComponent.Settings.Text2 = String.Format("{0:0.##}", current.percent) + "%";
+    vars.textComponent.Settings.Text2 = String.Format("{0:0.##}", current.percent).Replace(",",".") + "%";
 }
 
 exit {
