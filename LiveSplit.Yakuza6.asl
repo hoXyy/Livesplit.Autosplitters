@@ -1,51 +1,47 @@
-state("Yakuza6", "Game Pass - Launch Version") 
+// Yakuza 6 Load Remover by hoxi, contributions by Vojtas131
+// with help from rythin_songrequest
+state("Yakuza6") {}
+
+startup
 {
-    bool isLoad: 0x027DDB20, 0x1C4;
+	vars.memoryWatchers = new MemoryWatcherList();
 }
 
-state("Yakuza6", "Steam - 06.05.2021 Version")
-{
-    bool isLoad: 0x025F5280, 0x364;
-}
+init {
+	vars.threadScan = new Thread(() => {
+		Func<IntPtr, int, int, IntPtr> PtrFromOpcode = (ptr, targetOperandOffset, totalSize) => {
+			byte[] bytes = game.ReadBytes(ptr + targetOperandOffset, 4);
+			if (bytes == null) return IntPtr.Zero;
 
-state("Yakuza6", "Steam - 12.04.2021/21.04.2021 Version")
-{
-    bool isLoad: 0x025F5240, 0x1C4;
-}
-
-state("Yakuza6", "Steam - Launch Version") 
-{
-    bool isLoad: 0x025F0FC0, 0x364;
-}
-
-init
-{
-	// Use MD5 for newest version because module memory size is the same
-	string MD5Hash;
-    using (var md5 = System.Security.Cryptography.MD5.Create())
-        using (var s = File.Open(modules.First().FileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-        MD5Hash = md5.ComputeHash(s).Select(x => x.ToString("X2")).Aggregate((a, b) => a + b);
-
-	if (MD5Hash == "88A4781428F0A65F15C862A6B4526FB6") {
-		version = "Steam - 06.05.2021 Version";
-	}
-	else {
-		switch (modules.First().ModuleMemorySize)
-		{
-			case 60669952:
-				version = "Steam - 12.04.2021/21.04.2021 Version";
-				break;
-			case 62529536:
-				version = "Game Pass - Launch Version";
-				break;
-			case 60653568:
-				version = "Steam - Launch Version";
-				break;
+			Array.Reverse(bytes);
+			int offset = Convert.ToInt32(BitConverter.ToString(bytes).Replace("-", ""), 16);
+			IntPtr actualPtr = IntPtr.Add((ptr + totalSize), offset);
+			return actualPtr;
+		};
+	
+		SigScanTarget target = new SigScanTarget("4C 8B 15 ?? ?? ?? ?? 33 C0 45 8B 42 ?? 45 85 C0 74 ?? 44 8B 09");
+		target.OnFound = (proc, s, ptr) => PtrFromOpcode(ptr, 3, 7); 
+		SignatureScanner scanner = new SignatureScanner(game, modules.First().BaseAddress, modules.First().ModuleMemorySize);
+		IntPtr address = IntPtr.Zero;
+		Thread.Sleep(2000); // wait till game actually starts up 
+		int sigAttempt = 0; 
+		while (sigAttempt++ <= 100) {
+			if ((address = scanner.Scan(target)) != IntPtr.Zero) break;
+			Thread.Sleep(2000);
+			print("Current iteration: " + sigAttempt);  
 		}
-	}
+
+		print("Address: " + address.ToString());
+		vars.memoryWatchers.Add(new MemoryWatcher<bool>(new DeepPointer(address, 0xA8, 0x8, 0x18, 0x58, 0x10, 0xB0, 0x964)) { Name = "load"});
+	});
+	vars.threadScan.Start(); 
+}
+
+update {
+    vars.memoryWatchers.UpdateAll(game);   
 }
 
 isLoading
 {
-    return current.isLoad;
-} 
+	return vars.memoryWatchers["load"].Current; 
+}
