@@ -2,12 +2,9 @@
 // with help from rythin_songrequest
 state("Yakuza6") {}
 
-startup
-{
-	vars.memoryWatchers = new MemoryWatcherList();
-}
-
 init {
+
+	vars.memoryWatchers = new MemoryWatcherList();
 	vars.threadScan = new Thread(() => {
 		Func<IntPtr, int, int, IntPtr> PtrFromOpcode = (ptr, targetOperandOffset, totalSize) => {
 			byte[] bytes = game.ReadBytes(ptr + targetOperandOffset, 4);
