@@ -16,7 +16,7 @@ init {
 			return actualPtr;
 		};
 	
-		SigScanTarget target = new SigScanTarget("4C 8B 15 ?? ?? ?? ?? 33 C0 45 8B 42 ?? 45 85 C0 74 ?? 44 8B 09");
+		SigScanTarget target = new SigScanTarget("48 8B 0D ?? ?? ?? ?? 48 85 C9 74 ?? 66 0F 1F 84 ?? 00 00 00 00 48 8B 59 ??");
 		target.OnFound = (proc, s, ptr) => PtrFromOpcode(ptr, 3, 7); 
 		SignatureScanner scanner = new SignatureScanner(game, modules.First().BaseAddress, modules.First().ModuleMemorySize);
 		IntPtr address = IntPtr.Zero;
@@ -29,13 +29,13 @@ init {
 		}
 
 		print("Address: " + address.ToString());
-		vars.memoryWatchers.Add(new MemoryWatcher<bool>(new DeepPointer(address, 0xA8, 0x8, 0x18, 0x58, 0x10, 0xB0, 0x964)) { Name = "load"});
+		vars.memoryWatchers.Add(new MemoryWatcher<bool>(new DeepPointer(address, 0x28, 0x8, 0x364)) { Name = "load"});
 	});
 	vars.threadScan.Start(); 
 }
 
 update {
-    vars.memoryWatchers.UpdateAll(game);   
+    vars.memoryWatchers.UpdateAll(game);
 }
 
 isLoading
