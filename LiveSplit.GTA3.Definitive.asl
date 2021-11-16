@@ -102,7 +102,10 @@ startup
 
 	// Add missions settings and add them to lists for easy checking
 	foreach (var mission in vars.missionScripts) {
-		settings.Add(mission.Key + "_start", true, mission.Value, "missions_start");
+		// Can't do split on start of first mission with this method, so just remove this setting
+		if (mission.Key != "eight") {
+			settings.Add(mission.Key + "_start", true, mission.Value, "missions_start");
+		}
 		settings.Add(mission.Key + "_end", true, mission.Value, "missions_end");
 		vars.missionsStart.Add(mission.Key + "_start");
 		vars.missionsEnd.Add(mission.Key + "_end");
