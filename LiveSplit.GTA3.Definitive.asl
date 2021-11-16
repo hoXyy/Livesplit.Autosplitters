@@ -85,17 +85,27 @@ startup
 		{0x4E1A2A4, "Rampages"}
 	};
 
+	// Timer phase storage
+	vars.prevPhase = null;
+
 	// Split list to prevent double-splitting
 	vars.splits = new List<string>();
 
+	// Lists for checks
+	vars.missionsStart = new List<string>();
+	vars.missionsEnd = new List<string>();
 
 	// Add settings groups
-	settings.Add("missions", true, "Missions");
+	settings.Add("missions_end", true, "Missions (end)");
+	settings.Add("missions_start", false, "Missions (start)");
 	settings.Add("collectibles", false, "Collectibles");
 
-	// Add missions settings
+	// Add missions settings and add them to lists for easy checking
 	foreach (var mission in vars.missionScripts) {
-		settings.Add(mission.Key, true, mission.Value, "missions");
+		settings.Add(mission.Key + "_start", true, mission.Value, "missions_start");
+		settings.Add(mission.Key + "_end", true, mission.Value, "missions_end");
+		vars.missionsStart.Add(mission.Key + "_start");
+		vars.missionsEnd.Add(mission.Key + "_end");
 	};
 
 	// Add collectible settings
@@ -120,22 +130,56 @@ init
 update
 {
 	vars.memoryWatchers.UpdateAll(game);
+
+	// If timer state changes.
+	if (timer.CurrentPhase != vars.prevPhase) {
+		// Cleanup when the timer is stopped.
+		if (timer.CurrentPhase == TimerPhase.NotRunning) {
+			vars.splits.Clear();
+		}
+		// Stores the current phase the timer is in, so we can use the old one on the next frame.
+		vars.prevPhase = timer.CurrentPhase;
+	}
 }
 
 split
 {
-	// Missions check
-	if (vars.memoryWatchers["MissionsPassed"].Current == vars.memoryWatchers["MissionsPassed"].Old+1) {
-		if (!vars.splits.Contains(vars.memoryWatchers["MissionScript"].Current)) {
-			vars.splits.Add(vars.memoryWatchers["MissionScript"].Current);
-			return true;
+	// Missions passed check
+	foreach (var mission in vars.missionsEnd) {
+		if (settings[mission]) {
+			if (vars.memoryWatchers["MissionsPassed"].Current == vars.memoryWatchers["MissionsPassed"].Old+1) {
+				if (vars.memoryWatchers["MissionScript"].Current == mission.Replace("_end", string.Empty)) {
+					if (!vars.splits.Contains(mission)) {
+						vars.splits.Add(mission);
+						return true;
+					}
+				}
+			}
 		}
 	}
 
+	// Missions start check
+	foreach (var mission in vars.missionsStart) {
+		if (settings[mission]) {
+			if (vars.memoryWatchers["MissionScript"].Current != vars.memoryWatchers["MissionScript"].Old) {
+				if (vars.memoryWatchers["MissionScript"].Current == mission.Replace("_start", string.Empty)) {
+					if (!vars.splits.Contains(mission)) {
+						vars.splits.Add(mission);
+						return true;
+					}
+				}
+			}
+		}
+	}
+
+
 	// Collectibles check
 	foreach (var collectible in vars.collectibleAddresses) {
-		if (vars.memoryWatchers[collectible.Value].Current == vars.memoryWatchers[collectible.Value].Old+1) {
-			return true;
+		if (settings[collectible.Value])
+		{
+			if (vars.memoryWatchers[collectible.Value].Current == vars.memoryWatchers[collectible.Value].Old+1) {
+				return true;
+			}
 		}
 	}
 }
