@@ -1,4 +1,6 @@
-state("LibertyCity"){}
+// needed for each version to be actually detected properly
+state("LibertyCity", "1.0.0.14296"){}
+state("LibertyCity", "1.0.0.14377"){}
 
 startup
 {
@@ -85,6 +87,10 @@ startup
 		{0x4E1A2A4, "Rampages"}
 	};
 
+	// Address offsets
+	vars.offset1 = 0;
+	vars.offset2 = 0;
+
 	// Timer phase storage
 	vars.prevPhase = null;
 
@@ -119,14 +125,29 @@ startup
 
 init
 {
+	// Version detection
+	switch(modules.First().ModuleMemorySize)
+	{
+		case 91697152:
+			version = "1.0.0.14296";
+			vars.offset1 = 0x0;
+			vars.offset2 = 0x0;
+			break; 
+		case 91702272:
+			version = "1.0.0.14377";
+			vars.offset1 = 0x3810;
+			vars.offset2 = 0x3800;
+			break;
+	}
+
 	// Add memory watchers
 	vars.memoryWatchers = new MemoryWatcherList();
 
-	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer("LibertyCity.exe", 0x4E8BE84)){ Name = "MissionsPassed" });
-	vars.memoryWatchers.Add(new StringWatcher(new DeepPointer("LibertyCity.exe", 0x4F70578), 64){ Name = "MissionScript" });
+	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer("LibertyCity.exe", 0x4E8BE84+vars.offset1)){ Name = "MissionsPassed" });
+	vars.memoryWatchers.Add(new StringWatcher(new DeepPointer("LibertyCity.exe", 0x4F70578+vars.offset1), 64){ Name = "MissionScript" });
 
 	foreach (var collectible in vars.collectibleAddresses) {
-		vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer("LibertyCity.exe", collectible.Key)){ Name = collectible.Value });
+		vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer("LibertyCity.exe", collectible.Key+vars.offset2)){ Name = collectible.Value });
 	};
 }
 
