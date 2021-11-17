@@ -4,81 +4,145 @@ state("LibertyCity", "1.0.0.14377"){}
 
 startup
 {
-	// Script names for each supported mission
-	vars.missionScripts = new Dictionary<string,string> {
-		{"eight", "Give Me Liberty & Luigi's Girls"},
-		{"luigi2", "Don't Spank Ma Bitch Up"},
-		{"luigi3", "Drive Misty For Me"},
-		{"meat1", "The Crook"},
-		{"meat2", "The Thieves"},
-		{"meat3", "The Wife"},
-		{"meat4", "Her Lover"},
-		{"joey1", "Mike Lips Last Lunch"},
-		{"joey2", "Farewell 'Chunky' Lee Chong"},
-		{"joey3", "Van Heist"},
-		{"joey4", "Cipriani's Chauffeur"},
-		{"toni1", "Taking Out The Laundry"},
-		{"joey5", "Dead Skunk in The Trunk"},
-		{"diablo1", "Turismo"},
-		{"joey6", "The Getaway"},
-		{"toni2", "The Pick-up"},
-		{"t4x4_1", "Patriot Playground"},
-		{"toni3", "Salvatore's Called A Meeting"},
-		{"frank1", "Chaperone"},
-		{"frank2", "Cutting The Grass"},
-		{"toni4", "Triads and Tribulations"},
-		{"luigi4", "Pump-Action Pimp"},
-		{"rc1", "Diablo Destruction"},
-		{"luigi5", "The Fuzz Ball"},
-		{"diablo2", "I Scream, You Scream"},
-		{"diablo3", "Trial By Fire"},
-		{"diablo4", "Big 'n' Veiny"},
-		{"rc2", "Mafia Massacre"},
-		{"toni5", "Blow Fish"},
-		{"frank21", "Bomb Da Base: Act I"},
-		{"frank3", "Bomb Da Base: Act II"},
-		{"frank4", "Last Requests"},
-		{"asuka1", "Sayonara Salvatore"},
-		{"yard1", "Bling-Bling Scramble"},
-		{"asuka2", "Under Surveillance"},
-		{"kenji1", "Kanbu Bust-out"},
-		{"rc4", "Casino Calamity"},
-		{"kenji2", "Grand Theft Auto"},
-		{"yard2", "Uzi Rider"},
-		{"mayhem", "Multistorey Mayhem"},
-		{"asuka3", "Paparazzi Purge"},
-		{"asuka4", "Payday for Ray"},
-		{"ray1", "Silence the Sneak"},
-		{"asuka5", "Two-Faced Tanner"},
-		{"kenji3", "Deal Steal"},
-		{"kenji4", "Shima"},
-		{"kenji5", "Smack Down"},
-		{"t4x4_2", "A Ride in the Park"},
-		{"ray2", "Arms Shortage"},
-		{"ray3", "Evidence Dash"},
-		{"ray4", "Gone Fishing"},
-		{"yard3", "Gangcar Round-up"},
-		{"ray5", "Plaster Blaster"},
-		{"yard4", "Kingdom Come"},
-		{"love1", "Liberator"},
-		{"love2", "Waka-Gashira Wipeout!"},
-		{"love3", "A Drop in the Ocean"},
-		{"love4", "Grand Theft Aero"},
-		{"ray6", "Marked Man"},
-		{"love5", "Escort Service"},
-		{"rc3", "Rumpo Rampage"},
-		{"hood1", "Uzi Money"},
-		{"hood2", "Toyminator"},
-		{"hood3", "Rigged to Blow"},
-		{"hood4", "Bullion Run"},
-		{"asusb1", "Bait"},
-		{"love6", "Decoy"},
-		{"love7", "Love's Disappearance"},
-		{"asusb2", "Espresso-2-Go!"},
-		{"asusb3", "S.A.M"},
-		{"cat1", "The Exchange"},
-		{"hood5", "Rumble"},
-		{"t4x4_3", "Gripped!"}
+	vars.missions = new Dictionary<string,Dictionary<string,string>> {
+		{"Luigi Goterelli", new Dictionary<string,string> {
+			{"eight", "Give Me Liberty & Luigi's Girls"},
+			{"luigi2", "Don't Spank Ma Bitch Up"},
+			{"luigi3", "Drive Misty For Me"},
+			{"luigi4", "Pump-Action Pimp"},
+			{"luigi5", "The Fuzz Ball"}
+		}},
+		{"Joey Leone", new Dictionary<string,string> {
+			{"joey1", "Mike Lips Last Lunch"},
+			{"joey2", "Farewell 'Chunky' Lee Chong"},
+			{"joey3", "Van Heist"},
+			{"joey4", "Cipriani's Chauffeur"},
+			{"joey5", "Dead Skunk in The Trunk"},
+			{"joey6", "The Getaway"}
+		}},
+		{"Marty Chonks", new Dictionary<string,string> {
+			{"meat1", "The Crook"},
+			{"meat2", "The Thieves"},
+			{"meat3", "The Wife"},
+			{"meat4", "Her Lover"}
+		}},
+		{"Toni Cipriani", new Dictionary<string,string> {
+			{"toni1", "Taking Out The Laundry"},
+			{"toni2", "The Pick-up"},
+			{"toni3", "Salvatore's Called A Meeting"},
+			{"toni4", "Triads and Tribulations"},
+			{"toni5", "Blow Fish"}
+		}},
+		{"Salvatore Leone", new Dictionary<string,string> {
+			{"frank1", "Chaperone"},
+			{"frank2", "Cutting The Grass"},
+			{"frank21", "Bomb Da Base: Act I"},
+			{"frank3", "Bomb Da Base: Act II"},
+			{"frank4", "Last Requests"}
+		}},
+		{"El Burro", new Dictionary<string,string> {
+			{"diablo1", "Turismo"},
+			{"diablo2", "I Scream, You Scream"},
+			{"diablo3", "Trial By Fire"},
+			{"diablo4", "Big 'n' Veiny"}
+		}},
+		{"Asuka Kasen", new Dictionary<string,string> {
+			{"asuka1", "Sayonara Salvatore"},
+			{"asuka2", "Under Surveillance"},
+			{"asuka3", "Paparazzi Purge"},
+			{"asuka4", "Payday for Ray"},
+			{"asuka5", "Two-Faced Tanner"},
+			{"asusb1", "Bait"},
+			{"asusb2", "Espresso-2-Go!"},
+			{"asusb3", "S.A.M"}
+		}},
+		{"Kenji Kasen", new Dictionary<string,string> {
+			{"kenji1", "Kanbu Bust-out"},
+			{"kenji2", "Grand Theft Auto"},
+			{"kenji3", "Deal Steal"},
+			{"kenji4", "Shima"},
+			{"kenji5", "Smack Down"}
+		}},
+		{"Ray Machowski", new Dictionary<string,string> {
+			{"ray1", "Silence the Sneak"},
+			{"ray2", "Arms Shortage"},
+			{"ray3", "Evidence Dash"},
+			{"ray4", "Gone Fishing"},
+			{"ray5", "Plaster Blaster"},
+			{"ray6", "Marked Man"}
+		}},
+		{"Donald Love", new Dictionary<string,string> {
+			{"love1", "Liberator"},
+			{"love2", "Waka-Gashira Wipeout!"},
+			{"love3", "A Drop in the Ocean"},
+			{"love4", "Grand Theft Aero"},
+			{"love5", "Escort Service"},
+			{"love6", "Decoy"},
+			{"love7", "Love's Disappearance"}		
+		}},
+		{"King Courtney", new Dictionary<string,string> {
+			{"yard1", "Bling-Bling Scramble"},
+			{"yard2", "Uzi Rider"},
+			{"yard3", "Gangcar Round-up"},
+			{"yard4", "Kingdom Come"}
+		}},
+		{"Catalina", new Dictionary<string,string> {
+			{"cat1", "The Exchange"}
+		}},
+		{"D-Ice", new Dictionary<string,string> {
+			{"hood1", "Uzi Money"},
+			{"hood2", "Toyminator"},
+			{"hood3", "Rigged to Blow"},
+			{"hood4", "Bullion Run"},
+			{"hood5", "Rumble"}
+		}},
+		{"Off-Road Challenges", new Dictionary<string,string> {
+			{"t4x4_1", "Patriot Playground"},
+			{"mayhem", "Multistorey Mayhem"},
+			{"t4x4_2", "A Ride in the Park"},
+			{"t4x4_3", "Gripped!"}
+		}},
+		{"RC Toyz Missions", new Dictionary<string,string> {
+			{"rc1", "Diablo Destruction"},
+			{"rc2", "Mafia Massacre"},
+			{"rc3", "Rumpo Rampage"},
+			{"rc4", "Casino Calamity"},
+		}}
+	};
+
+	// Inserts split into settings and adds the mission to our separate list.
+	Action<string, bool> addMissionChain = (contact, defaultValue) => {
+		var parent = contact;
+		foreach (var mission in vars.missions[contact]) {
+			settings.Add(mission.Key + "_end", defaultValue, mission.Value, parent + "_end");
+			vars.missionsEnd.Add(mission.Key + "_end");
+		}
+	};
+	
+	// Inserts header (i.e. mission giver) into settings.
+	Action<string, bool, string> addMissionHeader = (contact, defaultValue, header) => {
+		var parent = contact;
+		settings.Add(parent + "_end", defaultValue, header);
+		addMissionChain(contact, defaultValue);
+	};
+
+	// Copy of above functions for mission/asset start
+	Action<string, bool> addMissionChainStart = (missions, defaultValue) => {
+		var parent = missions;
+		foreach (var mission in vars.missions[missions]) {
+			if (mission.Value == "Give Me Liberty & Luigi's Girls") // don't need this
+			{
+				continue;
+			}
+			settings.Add(mission.Key + "_start", defaultValue, mission.Value, parent + "_start");
+			vars.missionsStart.Add(mission.Key + "_start");
+		}
+	};
+	
+	Action<string, bool, string> addMissionHeaderStart = (contact, defaultValue, header) => {
+		var parent = contact;
+		settings.Add(parent + "_start", defaultValue, header);
+		addMissionChainStart(contact, defaultValue);
 	};
 
 	vars.collectibleAddresses = new Dictionary<int,string> {
@@ -106,16 +170,17 @@ startup
 	settings.Add("missions_start", false, "Missions (start)");
 	settings.Add("collectibles", false, "Collectibles");
 
-	// Add missions settings and add them to lists for easy checking
-	foreach (var mission in vars.missionScripts) {
-		// Can't do split on start of first mission with this method, so just remove this setting
-		if (mission.Key != "eight") {
-			settings.Add(mission.Key + "_start", true, mission.Value, "missions_start");
-		}
-		settings.Add(mission.Key + "_end", true, mission.Value, "missions_end");
-		vars.missionsStart.Add(mission.Key + "_start");
-		vars.missionsEnd.Add(mission.Key + "_end");
-	};
+	// Adding mission headers
+	settings.CurrentDefaultParent = "missions_end";
+	foreach (var header in vars.missions) {
+		addMissionHeader(header.Key, true, header.Key);
+		
+	}
+
+	settings.CurrentDefaultParent = "missions_start";
+	foreach(var header in vars.missions) {
+		addMissionHeaderStart(header.Key, false, header.Key);
+	}
 
 	// Add collectible settings
 	foreach (var collectible in vars.collectibleAddresses) {
