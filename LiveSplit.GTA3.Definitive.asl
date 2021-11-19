@@ -1,5 +1,5 @@
 // GTA III Definitive Edition autosplitter by hoxi, initial version by illuminati7777
-// Heavily based on original GTA III/VC autosplitters
+// Heavily based on the original GTA III/VC autosplitters
 
 // needed for each version to be actually detected properly
 state("LibertyCity", "1.0.0.14296"){}
@@ -292,7 +292,6 @@ init
 	// Add memory watchers
 	vars.memoryWatchers = new MemoryWatcherList();
 
-	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer("LibertyCity.exe", 0x4E8BE84+vars.offset1)){ Name = "MissionsPassed" });
 	vars.memoryWatchers.Add(new StringWatcher(new DeepPointer("LibertyCity.exe", 0x4F70578+vars.offset1), 64){ Name = "MissionScript" });
 
 	// Any% final split stuff
@@ -370,7 +369,10 @@ split
 	if (settings["any_end"]) {
 		if (vars.memoryWatchers["MissionScript"].Current == "cat1") {
 			if (vars.memoryWatchers["teHelipad"].Current == 1 && vars.memoryWatchers["teTimer"].Current != vars.memoryWatchers["teTimer"].Old) {
-				return true;
+				if (!vars.splits.Contains("any_end")) {
+					vars.splits.Add("any_end");
+					return true;
+				}
 			}
 		}
 	}
