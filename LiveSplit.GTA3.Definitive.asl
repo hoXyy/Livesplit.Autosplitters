@@ -115,7 +115,7 @@ startup
 		}}
 	};
 
-	// Script names used for mission start checking (until I figure out a better way to do it anyways)
+	// Script names used for mission start checking
 	vars.scripts = new Dictionary<string,string> {
 		{"luigi2", "Don't Spank Ma Bitch Up"},
 		{"luigi3", "Drive Misty For Me"},
@@ -232,8 +232,8 @@ startup
 	};
 
 	// Address offsets
-	vars.offset1 = 0;
-	vars.offset2 = 0;
+	vars.nameOffset = 0x0;
+	vars.scriptOffset = 0x0;
 
 	// Timer phase storage
 	vars.prevPhase = null;
@@ -270,6 +270,16 @@ startup
 	settings.CurrentDefaultParent = null;
 	settings.Add("any_end", true, "Any% Final Split");
 	settings.SetToolTip("any_end", "Splits once you lose control on \"The Exchange\".");
+
+	// Debug output
+	Action<string> DebugOutput = (text) => {
+		print("[GTAIII:DE Autosplitter] "+text);
+	};
+	vars.DebugOutput = DebugOutput;
+
+	// Split prevention things
+	vars.lastLoad = Environment.TickCount;
+	vars.waiting = false;
 }
 
 init
@@ -279,35 +289,39 @@ init
 	{
 		case 91697152:
 			version = "1.0.0.14296";
-			vars.offset1 = 0x0;
-			vars.offset2 = 0x0;
 			break; 
 		case 91702272:
 			version = "1.0.0.14377";
-			vars.offset1 = 0x3810;
-			vars.offset2 = 0x3800;
+			vars.nameOffset = 0x3810;
+			vars.scriptOffset = 0x3800;
 			break;
 	}
 
 	// Add memory watchers
 	vars.memoryWatchers = new MemoryWatcherList();
 
-	vars.memoryWatchers.Add(new StringWatcher(new DeepPointer("LibertyCity.exe", 0x4F70578+vars.offset1), 64){ Name = "MissionScript" });
+	vars.memoryWatchers.Add(new StringWatcher(new DeepPointer(0x4F70578+vars.nameOffset), 10){ Name = "MissionScript" });
+
+	// Not sure how this flag acts outside the intro, so it's only used for the start
+	vars.memoryWatchers.Add(new MemoryWatcher<byte>(new DeepPointer(0x4D54BDB+vars.nameOffset)) { Name = "startFlag" });
+
+	// Used for split prevention on loads
+	vars.memoryWatchers.Add(new MemoryWatcher<bool>(new DeepPointer(0x4F9D11C+vars.nameOffset)) { Name = "loading" });
 
 	// Any% final split stuff
-	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer("LibertyCity.exe", 0x4E19C00+vars.offset2)){ Name = "teTimer" });
-	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer("LibertyCity.exe", 0x4E1D93C+vars.offset2)){ Name = "teHelipad" });
+	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(0x4E19C00+vars.scriptOffset)){ Name = "teTimer" });
+	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(0x4E1D93C+vars.scriptOffset)){ Name = "teHelipad" });
 
 	// Missions
 	foreach (var strand in vars.missions) {
 		foreach (var address in strand.Value) {
-			vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer("LibertyCity.exe", address.Key+vars.offset2)){ Name = address.Value });
+			vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(address.Key+vars.scriptOffset)){ Name = address.Value });
 		}
 	}
 
 	// Collectibles
 	foreach (var collectible in vars.collectibleAddresses) {
-		vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer("LibertyCity.exe", collectible.Key+vars.offset2)){ Name = collectible.Value });
+		vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(collectible.Key+vars.scriptOffset)){ Name = collectible.Value });
 	};
 }
 
@@ -328,11 +342,38 @@ update
 
 split
 {
+	//=============================================================================
+	// Split prevention
+	//=============================================================================
+	if (vars.memoryWatchers["loading"].Current) {
+		vars.DebugOutput("Loading");
+		vars.lastLoad = Environment.TickCount;
+		return false;
+	}
+	if (Environment.TickCount - vars.lastLoad < 500) {
+		// Prevent splitting shortly after loading from a save, since this can
+		// sometimes occur because memory values change
+		if (!vars.waiting)
+		{
+			vars.DebugOutput("Wait..");
+			vars.waiting = true;
+		}
+		return false;
+	}
+	if (vars.waiting)
+	{
+		vars.DebugOutput("Done waiting..");
+		vars.waiting = false;
+	}
+
+	//=============================================================================
 	// Missions passed check
+	//=============================================================================
 	foreach (var mission in vars.missionsEnd) {
 		if (settings[mission]) {
 			if (vars.memoryWatchers[mission.Replace(" (end)", string.Empty)].Current == vars.memoryWatchers[mission.Replace(" (end)", string.Empty)].Old+1) {
 				if (!vars.splits.Contains(mission)) {
+					vars.DebugOutput("mission end split: " + mission);
 					vars.splits.Add(mission);
 					return true;
 				}
@@ -340,12 +381,15 @@ split
 		}
 	}
 
+	//=============================================================================
 	// Missions start check
+	//=============================================================================
 	foreach (var script in vars.scripts) {
 		if (settings[script.Value + " (start)"]) {
 			if (vars.memoryWatchers["MissionScript"].Current != vars.memoryWatchers["MissionScript"].Old) {
 				if (vars.memoryWatchers["MissionScript"].Current == script.Key) {
 					if (!vars.splits.Contains(script + " (start)")) {
+						vars.DebugOutput("mission start split: " + script.Value);
 						vars.splits.Add(script + " (start)");
 						return true;
 					}
@@ -354,27 +398,76 @@ split
 		}
 	}
 
-
+	//=============================================================================
 	// Collectibles check
+	//=============================================================================
 	foreach (var collectible in vars.collectibleAddresses) {
 		if (settings[collectible.Value])
 		{
 			if (vars.memoryWatchers[collectible.Value].Current == vars.memoryWatchers[collectible.Value].Old+1) {
+				vars.DebugOutput("collectible split: " + collectible.Value);
 				return true;
 			}
 		}
 	}
 
+	//=============================================================================
 	// Any% final split
+	//=============================================================================
 	if (settings["any_end"]) {
 		if (vars.memoryWatchers["MissionScript"].Current == "cat1") {
 			if (vars.memoryWatchers["teHelipad"].Current == 1 && vars.memoryWatchers["teTimer"].Current != vars.memoryWatchers["teTimer"].Old) {
 				if (!vars.splits.Contains("any_end")) {
+					vars.DebugOutput("any% final split");
 					vars.splits.Add("any_end");
 					return true;
 				}
 			}
 		}
+	}
+}
+
+start
+{
+	var startFlag = vars.memoryWatchers["startFlag"];
+	var thread = vars.memoryWatchers["MissionScript"];
+
+	// New Game
+	//=========
+	/*
+	 * startFlag switches to 0 from 1 when the game begins to fade out to the intro cutscene.
+	 * The check for the thread is there just for safety.
+	 */
+	if (startFlag.Current == 0 && startFlag.Old == 1 && thread.Current == "intro")
+	{
+		if (settings.StartEnabled)
+		{
+			// Only output when actually starting timer (the return value of this method
+			// is only respected by LiveSplit when the setting is actually enabled)
+			vars.DebugOutput("New Game");
+		}
+		return true;
+	}
+}
+
+reset
+{
+	var startFlag = vars.memoryWatchers["startFlag"];
+	var thread = vars.memoryWatchers["MissionScript"];
+
+	/*
+	 * Use same check for reset for the timer to reset and start in the same cycle.
+	 * Only downside is that accidental new game will reset the timer (but who would do that with the way DE menu is laid out?)
+	 */
+	if (startFlag.Current == 0 && startFlag.Old == 1 && thread.Current == "intro")
+	{
+		if (settings.ResetEnabled)
+		{
+			// Only output when actually resetting timer (the return value of this method
+			// is only respected by LiveSplit when the setting is actually enabled)
+			vars.DebugOutput("Reset");
+		}
+		return true;
 	}
 }
 
