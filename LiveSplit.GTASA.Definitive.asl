@@ -212,6 +212,15 @@ startup
 			{7, "Trucking 7"},
 			{8, "Trucking 8"}
 		}},
+		{0x5015CF4, new Dictionary<int,string> {
+			{1, "Quarry 1"},
+			{2, "Quarry 2"},
+			{3, "Quarry 3"},
+			{4, "Quarry 4"},
+			{5, "Quarry 5"},
+			{6, "Quarry 6"},
+			{7, "Quarry 7"}
+		}}
 	/*
 		{0x64A9C4, new Dictionary<int, string> { // $CURRENT_WANTED_LIST (Export)
 			{1, "Export List 1 Complete"},
@@ -292,7 +301,6 @@ startup
 			{0x500FC68, "Las Venturas Courier"}, 	// $MISSION_COURIER_LV_PASSED ($1993)
 			{0x500FC6C, "San Fierro Courier"}, 	// $MISSION_COURIER_SF_PASSED ($1994)
 			{0x500FAF0, "Valet Parking Complete"}, 	// $1900
-			{0x500F468, "Quarry Complete"}, 		// $MISSION_QUARRY_PASSED ($1493)
 		}},
 		// Races addresses are based on the global variable $RACES_WON ($3661), which
 		// is an array. The number in the comment is the $RACE_INDEX ($353).
@@ -598,6 +606,7 @@ startup
 	addMissionsHeader("Zero", 0x500CF90, "Zero");
 	addMissionsHeader("Wang Cars", 0x500CF98, "Wang Cars");
 	addMissionsHeader("Trucking", 0x5015CC4, "Trucking");
+	addMissionsHeader("Quarry", 0x5015CF4, "Quarry");
 	addMissions2Header("Assets", true, "Other Asset Missions");
 	addMissions2Header("Schools", true, "Schools");
 	settings.Add("Driving School Started", false, "Driving School Started", "Schools");
