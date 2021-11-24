@@ -7,7 +7,7 @@ state("ViceCity", "1.0.0.14388"){}
 
 startup
 {
-	refreshRate = 30; // default 60, lowered for less CPU usage
+	refreshRate = 20; // default 60, lowered for less CPU usage
 
 	// Assets/missions with only one objective (sans Kent Paul)
 	vars.missions2 = new Dictionary<string, int> {

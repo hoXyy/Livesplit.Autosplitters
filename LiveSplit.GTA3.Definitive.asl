@@ -7,7 +7,7 @@ state("LibertyCity", "1.0.0.14377"){}
 
 startup
 {
-	refreshRate = 30; // default 60, lowered for less CPU usage
+	refreshRate = 20; // default 60, lowered for less CPU usage
 
 	vars.missions = new Dictionary<string,Dictionary<int,string>> {
 		{"Luigi Goterelli", new Dictionary<int,string> {
