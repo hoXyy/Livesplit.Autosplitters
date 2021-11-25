@@ -388,9 +388,9 @@ startup
 	vars.waiting = false;
 
 	// Any% final split setting
-/* 	settings.CurrentDefaultParent = null;
+	settings.CurrentDefaultParent = null;
 	settings.Add("any_end", true, "Any% Final Split");
-	settings.SetToolTip("any_end", "Splits once you lose control on \"Keep Your Friends Close\"."); */
+	settings.SetToolTip("any_end", "Splits once you lose control on \"Keep Your Friends Close\".");
 }
 
 init
@@ -422,6 +422,12 @@ init
 
 	// Used for split prevention on loads
 	vars.memoryWatchers.Add(new MemoryWatcher<bool>(new DeepPointer(0x4C1A8C0+vars.loadOffset)) { Name = "loading" });
+
+	// Final any% split stuff
+	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(0x4E6D0A4+vars.scriptOffset)) { Name = "vance_flag" });
+	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(0x4E6D0BC+vars.scriptOffset)) { Name = "sonny_flag" });
+	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(0x4E6D0B8+vars.scriptOffset)) { Name = "sonny_timer" });
+
 
 	// Missions
 	foreach (var strand in vars.missions) {
@@ -535,6 +541,19 @@ split
 		{
 			if (vars.memoryWatchers[collectible.Value].Current == vars.memoryWatchers[collectible.Value].Old+1) {
 				vars.DebugOutput("collectible split: " + collectible.Value);
+				return true;
+			}
+		}
+	}
+
+	//=============================================================================
+	// Any% final split
+	//=============================================================================
+	if (vars.memoryWatchers["vance_flag"].Current == -11 && vars.memoryWatchers["sonny_flag"].Current == -11) {
+		if (vars.memoryWatchers["sonny_timer"].Current < vars.memoryWatchers["GameTimer"].Current) {
+			if (!vars.splits.Contains("any_end")) {
+				vars.splits.Add("any_end");
+				vars.DebugOutput("Any% final split");
 				return true;
 			}
 		}
