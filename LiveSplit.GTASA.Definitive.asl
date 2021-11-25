@@ -729,6 +729,7 @@ init
 	int moduleSize = modules.First().ModuleMemorySize;
 	switch (moduleSize) {
 		case 95293440:
+		case 95286272:
 			version = "1.0.0.14296";
 			break;
 		case 95290368:
