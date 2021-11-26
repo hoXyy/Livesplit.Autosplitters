@@ -806,7 +806,7 @@ init
 
 	foreach (var item in vars.collectibles) {
 		var type = item.Key;
-		var addr = item.Value+scriptOffset;
+		var addr = item.Value+collectibleOffset;
 		// Tags need a different offset
 		if (type == "Tags") {
 			addr = item.Value+tagsOffset;
