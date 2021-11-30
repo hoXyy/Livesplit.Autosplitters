@@ -4,6 +4,7 @@
 // needed for each version to be actually detected properly
 state("ViceCity", "1.0.0.14296"){}
 state("ViceCity", "1.0.0.14388"){}
+state("ViceCity", "1.0.0.14718"){}
 
 startup
 {
@@ -273,6 +274,7 @@ startup
 	vars.loadOffset = 0x0;
 	vars.flagOffset = 0x0;
 	vars.timerOffset = 0x0;
+	vars.finishOffset = 0x0;
 
 	// Timer phase storage
 	vars.prevPhase = null;
@@ -405,9 +407,19 @@ init
 			version = "1.0.0.14388";
 			vars.nameOffset = 0x5010; 
 			vars.scriptOffset = 0x7400;
+			vars.finishOffset = 0x7400;
 			vars.loadOffset = 0x42A12C;
 			vars.flagOffset = -0x22074B;
 			vars.timerOffset = 0x6810;
+			break;
+		case 92144640:
+			version = "1.0.0.14718";
+			vars.scriptOffset = 0xC780;
+			vars.nameOffset = 0xA360;
+			vars.finishOffset = 0xC774;
+			vars.timerOffset = 0xBB70;
+			vars.flagOffset = -0x46AB23;
+			vars.loadOffset = 0x25B01C; 
 			break;
 	}
 
@@ -424,9 +436,9 @@ init
 	vars.memoryWatchers.Add(new MemoryWatcher<bool>(new DeepPointer(0x4C1A8C0+vars.loadOffset)) { Name = "loading" });
 
 	// Final any% split stuff
-	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(0x4E6D0A4+vars.scriptOffset)) { Name = "vance_flag" });
-	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(0x4E6D0BC+vars.scriptOffset)) { Name = "sonny_flag" });
-	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(0x4E6D0B8+vars.scriptOffset)) { Name = "sonny_timer" });
+	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(0x4E6D0A4+vars.finishOffset)) { Name = "vance_flag" });
+	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(0x4E6D0BC+vars.finishOffset)) { Name = "sonny_flag" });
+	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(0x4E6D0B8+vars.finishOffset)) { Name = "sonny_timer" });
 
 
 	// Missions
