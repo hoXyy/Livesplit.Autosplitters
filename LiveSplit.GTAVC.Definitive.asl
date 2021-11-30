@@ -419,7 +419,7 @@ init
 			vars.finishOffset = 0xC774;
 			vars.timerOffset = 0xBB70;
 			vars.flagOffset = -0x46AB23;
-			vars.loadOffset = 0x25B01C; 
+			vars.loadOffset = 0x6B9584; 
 			break;
 	}
 
