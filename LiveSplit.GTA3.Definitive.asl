@@ -236,6 +236,7 @@ startup
 	vars.nameOffset = 0x0;
 	vars.scriptOffset = 0x0;
 	vars.startOffset = 0x0;
+	vars.loadOffset = 0x0;
 
 	// Timer phase storage
 	vars.prevPhase = null;
@@ -297,12 +298,14 @@ init
 			vars.nameOffset = 0x3810;
 			vars.scriptOffset = 0x3800;
 			vars.startOffset = 0x2010;
+			vars.loadOffset = 0x3810;
 			break;
 		case 91804672:
 			version = "1.0.0.14718";
 			vars.startOffset = 0x18360;
 			vars.nameOffset = 0x19BB0;
 			vars.scriptOffset = 0x19B80;
+			vars.loadOffset = 0x19B90;
 			break;
 
 	}
@@ -316,7 +319,7 @@ init
 	vars.memoryWatchers.Add(new MemoryWatcher<byte>(new DeepPointer(0x4BF2D67+vars.startOffset)) { Name = "startFlag" });
 
 	// Used for split prevention on loads
-	vars.memoryWatchers.Add(new MemoryWatcher<bool>(new DeepPointer(0x4F9D11C+vars.nameOffset)) { Name = "loading" });
+	vars.memoryWatchers.Add(new MemoryWatcher<bool>(new DeepPointer(0x4F9D11C+vars.loadOffset)) { Name = "loading" });
 
 	// Any% final split stuff
 	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(0x4E19C00+vars.scriptOffset)){ Name = "teTimer" });
