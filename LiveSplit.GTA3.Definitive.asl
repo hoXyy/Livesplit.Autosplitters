@@ -4,6 +4,7 @@
 // needed for each version to be actually detected properly
 state("LibertyCity", "1.0.0.14296"){}
 state("LibertyCity", "1.0.0.14377"){}
+state("LibertyCity", "1.0.0.14718"){}
 
 startup
 {
@@ -234,6 +235,7 @@ startup
 	// Address offsets
 	vars.nameOffset = 0x0;
 	vars.scriptOffset = 0x0;
+	vars.startOffset = 0x0;
 
 	// Timer phase storage
 	vars.prevPhase = null;
@@ -294,7 +296,15 @@ init
 			version = "1.0.0.14377";
 			vars.nameOffset = 0x3810;
 			vars.scriptOffset = 0x3800;
+			vars.startOffset = 0x2010;
 			break;
+		case 91804672:
+			version = "1.0.0.14718";
+			vars.startOffset = 0x18360;
+			vars.nameOffset = 0x19BB0;
+			vars.scriptOffset = 0x19B80;
+			break;
+
 	}
 
 	// Add memory watchers
@@ -303,7 +313,7 @@ init
 	vars.memoryWatchers.Add(new StringWatcher(new DeepPointer(0x4F70578+vars.nameOffset), 10){ Name = "MissionScript" });
 
 	// Not sure how this flag acts outside the intro, so it's only used for the start
-	vars.memoryWatchers.Add(new MemoryWatcher<byte>(new DeepPointer(0x4D54BDB+vars.nameOffset)) { Name = "startFlag" });
+	vars.memoryWatchers.Add(new MemoryWatcher<byte>(new DeepPointer(0x4BF2D67+vars.startOffset)) { Name = "startFlag" });
 
 	// Used for split prevention on loads
 	vars.memoryWatchers.Add(new MemoryWatcher<bool>(new DeepPointer(0x4F9D11C+vars.nameOffset)) { Name = "loading" });
