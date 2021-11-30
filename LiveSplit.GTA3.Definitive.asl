@@ -479,6 +479,9 @@ reset
 			// Only output when actually resetting timer (the return value of this method
 			// is only respected by LiveSplit when the setting is actually enabled)
 			vars.DebugOutput("Reset");
+			
+			// Clear already split missions, just in case
+			vars.splits.Clear();
 		}
 		return true;
 	}
