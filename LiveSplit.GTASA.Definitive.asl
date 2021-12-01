@@ -5,6 +5,7 @@
 
 state("SanAndreas", "1.0.0.14296"){}
 state("SanAndreas", "1.0.0.14388"){}
+state("SanAndreas", "1.0.0.14718"){}
 
 startup
 {
@@ -741,6 +742,15 @@ init
 			loadOffset = 0x350E;
 			startOffset = -0x30E9;
 			break;
+		case 95351808:
+			version = "1.0.0.14718";
+			startOffset = 0x8ECF;
+			nameOffset = 0xD320;
+			collectibleOffset = 0xF5C0;
+			tagsOffset = 0xFF14;
+			scriptOffset = 0xFE00;
+			loadOffset = 0xF82E;
+			break;
 	}
 
 	// Version detected
@@ -1143,6 +1153,9 @@ reset
 			// Only output when actually resetting timer (the return value of this method
 			// is only respected by LiveSplit when the setting is actually enabled)
 			vars.DebugOutput("Reset");
+
+			// Clear already split missions, just in case
+			vars.split.Clear();			
 		}
 		return true;
 	}
