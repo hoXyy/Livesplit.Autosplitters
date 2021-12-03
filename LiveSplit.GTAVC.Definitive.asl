@@ -450,7 +450,9 @@ init
 					vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(address.Key+vars.finishOffset)){ Name = address.Value });
 				}
 			}
-			vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(address.Key+vars.scriptOffset)){ Name = address.Value });
+			else {
+				vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(address.Key+vars.scriptOffset)){ Name = address.Value });
+			}
 		}
 	}
 
