@@ -441,6 +441,7 @@ startup
 		return false;
 	};
 
+
 /*
 	Func<Dictionary<int, Dictionary<int, string>>, string, bool> missionPresent2 = (d, m) => {
 		foreach (var item in d)
@@ -708,6 +709,13 @@ This may not work for all types of splits.");
 
 init
 {
+	Func<int, string, int> patternReference = (patternOffset, patternStr) => {
+		var page = modules.First();
+		var scanner = new SignatureScanner(game, page.BaseAddress, page.ModuleMemorySize);
+		IntPtr offsetPtr = scanner.Scan(new SigScanTarget(patternOffset, patternStr));
+		return (int) (offsetPtr.ToInt64() - page.BaseAddress.ToInt64() + game.ReadValue<int>(offsetPtr) + 0x4);
+	};
+	
 	//=============================================================================
 	// Version Detection
 	//=============================================================================
@@ -721,7 +729,7 @@ init
 
 	int startAddr =		0x524206C;
 	int threadAddr =	0x4E9F420;
-	int loadingAddr =	0x4EA960E;
+	int loadingAddr =	patternReference(3, "0f b6 ?? ?? ?? ?? ?? ?? 88 ?? ?? ?? ?? ?? ?? 89 ?? ?? ?? ?? ?? 66 89 ?? ?? ?? ?? ?? ?? 88");
 
 	// Detect Version
 	//===============
@@ -805,7 +813,7 @@ init
 	vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(0x500F960+scriptOffset)) { Name = "chiliadDone" });
 
 	// This turns to 0 while the load screen is still up, so it's only used for split prevention
-	vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(loadingAddr+loadOffset)) { Name = "loading" });
+	vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(loadingAddr)) { Name = "loading" });
 
 	// Not sure how this flag acts outside the intro, so it's only used for the start
 	vars.watchers.Add(new MemoryWatcher<byte>(new DeepPointer(startAddr+startOffset)) { Name = "startFlag" });

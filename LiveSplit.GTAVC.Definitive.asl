@@ -444,15 +444,7 @@ init
 	// Missions
 	foreach (var strand in vars.missions) {
 		foreach (var address in strand.Value) {
-			// Variables for these missions have a different offset in the later versions
-			if (version == "1.0.0.14718") {
-				if (address.Value == "RC Raider" || address.Value == "RC Bandit" || address.Value == "RC Baron" || address.Value == "Dirtring") {
-					vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(address.Key+vars.finishOffset)){ Name = address.Value });
-				}
-			}
-			else {
-				vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(address.Key+vars.scriptOffset)){ Name = address.Value });
-			}
+			vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(address.Key+vars.scriptOffset)){ Name = address.Value });
 		}
 	}
 
