@@ -1,6 +1,7 @@
 // GTA San Andreas Definitive Edition autosplitter
 // Original code by tduva and contributors, adapted for DE by hoxi
 // The variable names in the comments are a combination of old OG SA ones and new SA DE ones, so don't take all you see here as 100% correct
+// Patterns for signature scanning and global variable indexes provided by Parik
 
 
 state("SanAndreas", "1.0.0.14296"){}
@@ -21,17 +22,17 @@ startup
 	 * Collectible type acts as setting ID, so don't change it.
 	 */
 	vars.collectibles = new Dictionary<string,int> {
-		{"Photos",	0x507384C},
-		{"Tags",	0x5570594},
-		{"Oysters",	0x507387C},
-		{"Horseshoes", 0x5073874},
-		{"Stunts (Completed)", 0x50736F4}
+		{"Photos",	166},
+		{"Tags",	322},
+		{"Oysters",	243},
+		{"Horseshoes", 241},
+		{"Stunts (Completed)", 145}
 	};
 
 	// Missions
 	//=========
 	/*
-	 * Memory addresses and the associated values and missions.
+	 * Global variable index and the associated values and missions.
 	 *
 	 * Commenting out missions may interfere with custom splits that
 	 * refer to their status (MissionPassed-function).
@@ -40,11 +41,11 @@ startup
 	 * them.
 	 */
 	vars.missions = new Dictionary<int, Dictionary<int, string>> {
-		{0x500CE18, new Dictionary<int, string> { // $INTRO_TOTAL_PASSED_MISSIONS
+		{450, new Dictionary<int, string> { // $INTRO_TOTAL_PASSED_MISSIONS
 			{1, "Big Smoke"},
 			{2, "Ryder"}
 		}},
-		{0x500CE28, new Dictionary<int, string> { // $SWEET_TOTAL_PASSED_MISSIONS
+		{454, new Dictionary<int, string> { // $SWEET_TOTAL_PASSED_MISSIONS
 			{1, "Tagging up Turf"},
 			{2, "Cleaning the Hood"},
 			{3, "Drive-Thru"},
@@ -55,74 +56,74 @@ startup
 			{8, "Doberman"},
 			{9, "Los Sepulcros"}
 		}},
-		{0x500CE30, new Dictionary<int, string> { // $SMOKE_TOTAL_PASSED_MISSIONS
+		{456, new Dictionary<int, string> { // $SMOKE_TOTAL_PASSED_MISSIONS
 			{1, "OG Loc"},
 			{2, "Running Dog"},
 			{3, "Wrong Side of the Tracks"},
 			{4, "Just Business"}
 		}},
-		{0x500CE2C, new Dictionary<int, string> { // $RYDER_TOTAL_PASSED_MISSIONS
+		{455, new Dictionary<int, string> { // $RYDER_TOTAL_PASSED_MISSIONS
 			{1, "Home Invasion"},
 			{2, "Catalyst"},
 			{3, "Robbing Uncle Sam"}
 		}},
-		{0x500CE40, new Dictionary<int, string> { // $LS_FINAL_TOTAL_PASSED_MISSIONS
+		{460, new Dictionary<int, string> { // $LS_FINAL_TOTAL_PASSED_MISSIONS
 			{1, "Reuniting the Families"},
 			{2, "The Green Sabre"}
 		}},
-		{0x500CE38, new Dictionary<int, string> { // $CRASH_LS_TOTAL_PASSED_MISSIONS
+		{458, new Dictionary<int, string> { // $CRASH_LS_TOTAL_PASSED_MISSIONS
 			{1, "Burning Desire"},
 			{2, "Gray Imports"}
 		}},
-		{0x500CE34, new Dictionary<int, string> { // $OG_LOC_TOTAL_PASSED_MISSIONS
+		{457, new Dictionary<int, string> { // $OG_LOC_TOTAL_PASSED_MISSIONS
 			{1, "Life's a Beach"},
 			{2, "Madd Dogg's Rhymes"},
 			{3, "Management Issues"},
 			{4, "House Party (Cutscene)"},
 			{5, "House Party"}
 		}},
-		{0x500CE3C, new Dictionary<int, string> { // $MISSION_LOWRIDER_PASSED
+		{459, new Dictionary<int, string> { // $MISSION_LOWRIDER_PASSED
 			{1, "High Stakes Lowrider"}
 		}}, 
-		{0x500CECC, new Dictionary<int, string> { // $MISSION_BADLANDS_PASSED
+		{495, new Dictionary<int, string> { // $MISSION_BADLANDS_PASSED
 			{1, "Badlands"}
 		}},
-		{0x500D250, new Dictionary<int, string> { // $MISSION_TANKER_COMMANDER_PASSED
+		{720, new Dictionary<int, string> { // $MISSION_TANKER_COMMANDER_PASSED
 			{1, "Tanker Commander"}
 		}},
-		{0x500D24C, new Dictionary<int, string> { // $MISSION_SMALL_TOWN_BANK_PASSED
+		{719, new Dictionary<int, string> { // $MISSION_SMALL_TOWN_BANK_PASSED
 			{1, "Small Town Bank"}
 		}},
-		{0x500D248, new Dictionary<int, string> { // $MISSION_LOCAL_LIQUOR_STORE_PASSED
+		{718, new Dictionary<int, string> { // $MISSION_LOCAL_LIQUOR_STORE_PASSED
 			{1, "Local Liquor Store"}
 		}},
-		{0x500D254, new Dictionary<int, string> { // $ALL_CATALINA_MISSIONS_PASSED (not aptly named variable)
+		{721, new Dictionary<int, string> { // $ALL_CATALINA_MISSIONS_PASSED (not aptly named variable)
 			{1, "Against All Odds"}
 		}},
-		{0x500FF10, new Dictionary<int, string> { // $2163
+		{3584, new Dictionary<int, string> { // $2163
 			{1, "King in Exile"}
 		}},
-		{0x500CEC4, new Dictionary<int, string> { // $TRUTH_TOTAL_PASSED_MISSIONS
+		{493, new Dictionary<int, string> { // $TRUTH_TOTAL_PASSED_MISSIONS
 			{1, "Body Harvest"},
 			{2, "Are You Going To San Fierro?"}
 		}},
-		{0x50101AC, new Dictionary<int, string> { // $RACES_WON_NUMBER (first 3 Races are in a fixed order due to missions)
+		{3751, new Dictionary<int, string> { // $RACES_WON_NUMBER (first 3 Races are in a fixed order due to missions)
 			{2, "Wu Zi Mu"},
 			{3, "Farewell, My Love"},
 			{25, "All Races Won"}
 		}},
-		{0x500CF8C, new Dictionary<int, string> { // $GARAGE_TOTAL_PASSED_MISSIONS
+		{543, new Dictionary<int, string> { // $GARAGE_TOTAL_PASSED_MISSIONS
 			{1, "Wear Flowers in your Hair"},
 			{2, "Deconstruction"}
 		}},
-		{0x500CF94, new Dictionary<int, string> { // $WUZIMU_TOTAL_PASSED_MISSIONS
+		{545, new Dictionary<int, string> { // $WUZIMU_TOTAL_PASSED_MISSIONS
 			{1, "Mountain Cloud Boys"},
 			{2, "Ran Fa Li"},
 			{3, "Lure"},
 			{4, "Amphibious Assault"},
 			{5, "The Da Nang Thang"}
 		}},
-		{0x500CF9C, new Dictionary<int, string> { // $SYNDICATE_TOTAL_PASSED_MISSIONS
+		{547, new Dictionary<int, string> { // $SYNDICATE_TOTAL_PASSED_MISSIONS
 			{1, "Photo Opportunity"},
 			{2, "Jizzy (Cutscene)"},
 			{3, "Jizzy"},
@@ -134,11 +135,11 @@ startup
 			{9, "Toreno's Last Flight"},
 			{10, "Yay Ka-Boom-Boom"}
 		}},
-		{0x500CFA0, new Dictionary<int, string> { // $CRASH_SF_TOTAL_PASSED_MISSIONS
+		{548, new Dictionary<int, string> { // $CRASH_SF_TOTAL_PASSED_MISSIONS
 			{1, "555 WE TIP"},
 			{2, "Snail Trail"}
 		}},
-		{0x500D05C, new Dictionary<int, string> { // $TORENO_TOTAL_PASSED_MISSIONS
+		{595, new Dictionary<int, string> { // $TORENO_TOTAL_PASSED_MISSIONS
 			{1, "Monster"},
 			{2, "Highjack"},
 			{3, "Interdiction"},
@@ -149,18 +150,18 @@ startup
 			{8, "Black Project"},
 			{9, "Green Goo"}
 		}},
-		{0x500CF90, new Dictionary<int, string> { // $ZERO_TOTAL_PASSED_MISSIONS
+		{544, new Dictionary<int, string> { // $ZERO_TOTAL_PASSED_MISSIONS
 			{1, "Air Raid"},
 			{2, "Supply Lines..."},
 			{3, "New Model Army"}
 		}},
-		{0x500CF98, new Dictionary<int, string> { // $STEAL_TOTAL_PASSED_MISSIONS
+		{546, new Dictionary<int, string> { // $STEAL_TOTAL_PASSED_MISSIONS
 			{1, "Zeroing In"},
 			{2, "Test Drive"},
 			{3, "Customs Fast Track"},
 			{4, "Puncture Wounds"}
 		}},
-		{0x500D06C, new Dictionary<int, string> { // $CASINO_TOTAL_PASSED_MISSIONS
+		{599, new Dictionary<int, string> { // $CASINO_TOTAL_PASSED_MISSIONS
 			{1, "Fender Ketchup"},
 			{2, "Explosive Situation"},
 			{3, "You've Had Your Chips"},
@@ -171,14 +172,14 @@ startup
 			{8, "Freefall"},
 			{9, "Saint Mark's Bistro"}
 		}},
-		{0x500D070, new Dictionary<int, string> { // $598 (CRASH_LV)
+		{600, new Dictionary<int, string> { // $598 (CRASH_LV)
 			{1, "Misappropriation"},
 			{2, "High Noon"}
 		}},
-		{0x500D074, new Dictionary<int, string> { // $599 (Madd Dogg)
+		{601, new Dictionary<int, string> { // $599 (Madd Dogg)
 			{1, "Madd Dogg"}
 		}},
-		{0x500D078, new Dictionary<int, string> { // $HEIST_TOTAL_PASSED_MISSIONS
+		{602, new Dictionary<int, string> { // $HEIST_TOTAL_PASSED_MISSIONS
 			{1, "Architectural Espionage"},
 			{2, "Key to her Heart"},
 			{3, "Dam and Blast"},
@@ -186,24 +187,24 @@ startup
 			{5, "Up, Up and Away!"},
 			{6, "Breaking the Bank at Caligula's"}
 		}},
-		{0x500D0E0, new Dictionary<int, string> { // $MANSION_TOTAL_PASSED_MISSIONS
+		{628, new Dictionary<int, string> { // $MANSION_TOTAL_PASSED_MISSIONS
 			{1, "A Home in the Hills"},
 			{2, "Vertical Bird"},
 			{3, "Home Coming"},
 			{4, "Cut Throat Business"}
 		}},
-		{0x500D0E4, new Dictionary<int, string> { // $GROVE_TOTAL_PASSED_MISSIONS
+		{629, new Dictionary<int, string> { // $GROVE_TOTAL_PASSED_MISSIONS
 			{1, "Beat Down on B Dup"},
 			{2, "Grove 4 Life"}
 		}},
-		{0x500D0EC, new Dictionary<int, string> { // $RIOT_TOTAL_PASSED_MISSIONS
+		{631, new Dictionary<int, string> { // $RIOT_TOTAL_PASSED_MISSIONS
 			{1, "Riot"},
 			{2, "Los Desperados"},
 			{3, "End of the Line Part 1"},
 			{4, "End of the Line Part 2"},
 			{5, "End of the Line Part 3"} // After credits
 		}},
-		{0x5015CC4, new Dictionary<int, string> { // $TRUCKING_TOTAL_PASSED_MISSIONS
+		{9581, new Dictionary<int, string> { // $TRUCKING_TOTAL_PASSED_MISSIONS
 			{1, "Trucking 1"},
 			{2, "Trucking 2"},
 			{3, "Trucking 3"},
@@ -213,7 +214,7 @@ startup
 			{7, "Trucking 7"},
 			{8, "Trucking 8"}
 		}},
-		{0x5015CF4, new Dictionary<int,string> {
+		{9593, new Dictionary<int,string> {
 			{1, "Quarry 1"},
 			{2, "Quarry 2"},
 			{3, "Quarry 3"},
@@ -240,68 +241,68 @@ startup
 	vars.missions2 = new Dictionary<string, Dictionary<int, string>> {
 		// Flight School not here because it is a Story Mission
 		{"Schools", new Dictionary<int, string> {
-			{0x5015110, "Driving School Passed"},	// $MISSION_BACK_TO_SCHOOL_PASSED
-			{0x500FC08, "Boat School Passed"},	// $MISSION_BOAT_SCHOOL_PASSED
-			{0x500FFA8, "Bike School Passed"},	// $MISSION_DRIVING_SCHOOL_PASSED (actually Bike School)
+			{8832, "Driving School Passed"},	// $MISSION_BACK_TO_SCHOOL_PASSED
+			{3390, "Boat School Passed"},	// $MISSION_BOAT_SCHOOL_PASSED
+			{3622, "Bike School Passed"},	// $MISSION_DRIVING_SCHOOL_PASSED (actually Bike School)
 		}},
 		{"Vehicle Submissions", new Dictionary<int, string> {
-			{0x500F458, "Firefighter Complete"},	// $1489 (directly goes to 2 when complete)
-			{0x500F454, "Vigilante Complete"},	// $1488
-			{0x500F460, "Taxi Mission Complete"},	// $MISSION_TAXI_PASSED ($1491)
-			{0x500F450, "Paramedic Complete"},	// $1487
-			{0x500FC60, "Pimping Complete"},		// $MISSION_PIMPING_PASSED ($1991)
+			{2898, "Firefighter Complete"},	// $1489 (directly goes to 2 when complete)
+			{2897, "Vigilante Complete"},	// $1488
+			{2900, "Taxi Mission Complete"},	// $MISSION_TAXI_PASSED ($1491)
+			{2896, "Paramedic Complete"},	// $1487
+			{3412, "Pimping Complete"},		// $MISSION_PIMPING_PASSED ($1991)
 		}},
 		{"Properties", new Dictionary<int, string> {
-			{0x500F68C, "Zero (RC Shop Bought)"},
-			{0x500D28C, "Santa Maria Beach (Safehouse)"},
-			{0x500D290, "Rockshore West (Safehouse)"},
-			{0x500D294, "Fort Carson (Safehouse)"},
-			{0x500D298, "Prickle Pine (Safehouse)"},
-			{0x500D29C, "Whitewood Estate (Safehouse)"},
-			{0x500D2A0, "Palomino Creek (Safehouse)"},
-			{0x500D2A4, "Redsands West (Safehouse)"},
-			{0x500D2A8, "Verdant Bluffs (Safehouse)"},
-			{0x500D2AC, "Calton Heights (Safehouse)"},
-			{0x500D2B0, "Mulholland (Safehouse)"},
-			{0x500D2B4, "Paradiso (Safehouse)"},
-			{0x500D2B8, "Hashbury (Safehouse)"},
-			{0x500D2BC, "Verona Beach (Safehouse)"},
-			{0x500D2C0, "Pirates In Men's Pants (Hotel Suite)"},
-			{0x500D2C4, "The Camel's Toe (Hotel Suite)"},
-			{0x500D2C8, "Chinatown (Safehouse)"},
-			{0x500D2CC, "Whetstone (Safehouse)"},
-			{0x500D2D0, "Doherty (Safehouse)"},
-			{0x500D2D4, "Queens (Hotel Suite)"},
-			{0x500D2D8, "Angel Pine (Safehouse)"},
-			{0x500D2DC, "El Quebrados (Safehouse)"},
-			{0x500D2E0, "Tierra Robada (Safehouse)"},
-			{0x500D2E4, "Dillimore (Safehouse)"},
-			{0x500D2E8, "Jefferson (Safehouse)"},
-			{0x500D2EC, "Old Venturas Strip (Hotel Suite)"},
-			{0x500D2F0, "The Clown's Pocket (Hotel Suite)"},
-			{0x500D2F4, "Creek (Safehouse)"},
-			{0x500D2F8, "Willowfield (Safehouse)"},
-			{0x500D2FC, "Blueberry (Safehouse)"},
+			{3039, "Zero (RC Shop Bought)"},
+			{735, "Santa Maria Beach (Safehouse)"},
+			{736, "Rockshore West (Safehouse)"},
+			{737, "Fort Carson (Safehouse)"},
+			{738, "Prickle Pine (Safehouse)"},
+			{739, "Whitewood Estate (Safehouse)"},
+			{740, "Palomino Creek (Safehouse)"},
+			{741, "Redsands West (Safehouse)"},
+			{742, "Verdant Bluffs (Safehouse)"},
+			{743, "Calton Heights (Safehouse)"},
+			{744, "Mulholland (Safehouse)"},
+			{745, "Paradiso (Safehouse)"},
+			{746, "Hashbury (Safehouse)"},
+			{747, "Verona Beach (Safehouse)"},
+			{748, "Pirates In Men's Pants (Hotel Suite)"},
+			{749, "The Camel's Toe (Hotel Suite)"},
+			{750, "Chinatown (Safehouse)"},
+			{751, "Whetstone (Safehouse)"},
+			{752, "Doherty (Safehouse)"},
+			{753, "Queens (Hotel Suite)"},
+			{754, "Angel Pine (Safehouse)"},
+			{755, "El Quebrados (Safehouse)"},
+			{756, "Tierra Robada (Safehouse)"},
+			{757, "Dillimore (Safehouse)"},
+			{758, "Jefferson (Safehouse)"},
+			{759, "Old Venturas Strip (Hotel Suite)"},
+			{760, "The Clown's Pocket (Hotel Suite)"},
+			{761, "Creek (Safehouse)"},
+			{762, "Willowfield (Safehouse)"},
+			{763, "Blueberry (Safehouse)"},
 		}},
 		{"Freight", new Dictionary<int, string> {
-			{0x5015E28, "Freight Level 1"},	// $8240
-			{0x5015E24, "Freight Level 2"},	// $8239 (goes to 2 at the end of the level)
+			{9670, "Freight Level 1"},	// $8240
+			{9669, "Freight Level 2"},	// $8239 (goes to 2 at the end of the level)
 		}},
 		{"Gym Moves", new Dictionary<int, string> {
-			{0x5015CAC, "Los Santos Gym Moves"}, 	// $8153
-			{0x5015CB0, "San Fierro Gym Moves"}, 	// $8154
-			{0x5015CC0, "Las Venturas Gym Moves"}, 	// $8158
+			{9575, "Los Santos Gym Moves"}, 	// $8153
+			{9576, "San Fierro Gym Moves"}, 	// $8154
+			{9580, "Las Venturas Gym Moves"}, 	// $8158
 		}},
 		{"Challenges", new Dictionary<int, string> {
-			{0x50108E8, "NRG-500 Stunt Challenge"}, 	// $4214
-			{0x50108E4, "BMX Stunt Challenge"},	// $4213
-			{0x5012F98, "Shooting Range Complete"}, 	// $5272
+			{4214, "NRG-500 Stunt Challenge"}, 	// $4214
+			{4213, "BMX Stunt Challenge"},	// $4213
+			{6690, "Shooting Range Complete"}, 	// $5272
 		}},	
 		{"Assets", new Dictionary<int, string> {
-			{0x500FC64, "Los Santos Courier"}, 	// $MISSION_COURIER_LS_PASSED ($1992)
-			{0x500FC68, "Las Venturas Courier"}, 	// $MISSION_COURIER_LV_PASSED ($1993)
-			{0x500FC6C, "San Fierro Courier"}, 	// $MISSION_COURIER_SF_PASSED ($1994)
-			{0x500FAF0, "Valet Parking Complete"}, 	// $1900
+			{3413, "Los Santos Courier"}, 	// $MISSION_COURIER_LS_PASSED ($1992)
+			{3414, "Las Venturas Courier"}, 	// $MISSION_COURIER_LV_PASSED ($1993)
+			{3415, "San Fierro Courier"}, 	// $MISSION_COURIER_SF_PASSED ($1994)
+			{3320, "Valet Parking Complete"}, 	// $1900
 		}},
 		// Races addresses are based on the global variable $RACES_WON ($3661), which
 		// is an array. The number in the comment is the $RACE_INDEX ($353).
@@ -310,40 +311,40 @@ startup
 		// Lowrider Race (0), Badlands A (7), Badlands B (8)
 		//
 		{"LS Races", new Dictionary<int, string> {
-			{0x5010138, "Little Loop"},		// 1
-			{0x501013C, "Backroad Wanderer"}, 	// 2
-			{0x5010140, "City Circuit"},		// 3
-			{0x5010144, "Vinewood (Race)"},		// 4
-			{0x5010148, "Freeway (Race)"},		// 5
-			{0x501014C, "Into the Country"},		// 6
+			{3722, "Little Loop"},		// 1
+			{3723, "Backroad Wanderer"}, 	// 2
+			{3724, "City Circuit"},		// 3
+			{3725, "Vinewood (Race)"},		// 4
+			{3726, "Freeway (Race)"},		// 5
+			{3727, "Into the Country"},		// 6
 		}},
 		{"SF Races", new Dictionary<int, string> {	
-			{0x5010150, "Dirtbike Danger"},		// 9
-			{0x5010154, "Bandito County"},		// 10
-			{0x5010158, "Go-Go Karting"},		// 11
-			{0x501015C, "San Fierro Fastlane"}, 	// 12
-			{0x5010160, "San Fierro Hills"},		// 13
-			{0x5010164, "Country Endurance"}, 	// 14
+			{3728, "Dirtbike Danger"},		// 9
+			{3729, "Bandito County"},		// 10
+			{3730, "Go-Go Karting"},		// 11
+			{3731, "San Fierro Fastlane"}, 	// 12
+			{3732, "San Fierro Hills"},		// 13
+			{3733, "Country Endurance"}, 	// 14
 		}},
 		{"LV Races", new Dictionary<int, string> {
-			{0x5010168, "SF to LV"},			// 15
-			{0x501016C, "Dam Rider"},		// 16
-			{0x5010170, "Desert Tricks"},		// 17
-			{0x5010174, "LV Ringroad"},		// 18
+			{3734, "SF to LV"},			// 15
+			{3735, "Dam Rider"},		// 16
+			{3736, "Desert Tricks"},		// 17
+			{3737, "LV Ringroad"},		// 18
 		}},
 		{"Air Races", new Dictionary<int, string> {
-			{0x5010178, "World War Ace"},		// 19
-			{0x501017C, "Barnstorming"},		// 20
-			{0x5010180, "Military Service"}, 	// 21
-			{0x5010184, "Chopper Checkpoint"}, 	// 22
-			{0x5010188, "Whirly Bird Waypoint"},	// 23
-			{0x501018C, "Heli Hell"},		// 24
+			{3738, "World War Ace"},		// 19
+			{3739, "Barnstorming"},		// 20
+			{3740, "Military Service"}, 	// 21
+			{3741, "Chopper Checkpoint"}, 	// 22
+			{3742, "Whirly Bird Waypoint"},	// 23
+			{3743, "Heli Hell"},		// 24
 		}},
 		{"Stadium Events", new Dictionary<int, string> {
-			{0x5010190, "8-Track"},			// 25
-			{0x5010194, "Dirt Track"},		// 26
-			{0x500C87C, "Kickstart"}, 		// $MISSION_KICKSTART_PASSED ($90)
-			{0x500FB98, "Bloodring"}, 		// $MISSION_BLOODRING_PASSED ($1941)
+			{3744, "8-Track"},			// 25
+			{3745, "Dirt Track"},		// 26
+			{91, "Kickstart"}, 		// $MISSION_KICKSTART_PASSED ($90)
+			{3362, "Bloodring"}, 		// $MISSION_BLOODRING_PASSED ($1941)
 		}},
 	};
 
@@ -604,11 +605,11 @@ startup
 	settings.Add("Missions2", true, "Side Missions");
 	settings.CurrentDefaultParent = "Missions2";
 
-	addMissionsHeader("Heist", 0x500D078, "Heist");
-	addMissionsHeader("Zero", 0x500CF90, "Zero");
-	addMissionsHeader("Wang Cars", 0x500CF98, "Wang Cars");
-	addMissionsHeader("Trucking", 0x5015CC4, "Trucking");
-	addMissionsHeader("Quarry", 0x5015CF4, "Quarry");
+	addMissionsHeader("Heist", 602, "Heist");
+	addMissionsHeader("Zero", 544, "Zero");
+	addMissionsHeader("Wang Cars", 546, "Wang Cars");
+	addMissionsHeader("Trucking", 9581, "Trucking");
+	addMissionsHeader("Quarry", 9593, "Quarry");
 	addMissions2Header("Assets", true, "Other Asset Missions");
 	addMissions2Header("Schools", true, "Schools");
 	settings.Add("Driving School Started", false, "Driving School Started", "Schools");
@@ -709,55 +710,54 @@ This may not work for all types of splits.");
 
 init
 {
-	Func<int, string, int> patternReference = (patternOffset, patternStr) => {
+	// Used for pattern scans
+	Func<int, string, int> getAddressFromPattern = (patternOffset, patternStr) => {
 		var page = modules.First();
 		var scanner = new SignatureScanner(game, page.BaseAddress, page.ModuleMemorySize);
 		IntPtr offsetPtr = scanner.Scan(new SigScanTarget(patternOffset, patternStr));
 		return (int) (offsetPtr.ToInt64() - page.BaseAddress.ToInt64() + game.ReadValue<int>(offsetPtr) + 0x4);
+	};
+
+
+	// Used for integer stats
+	Func<int, int> getIntStatOffset = (statId) => {
+		return (int) (statId - 82) * 4;
+	};
+
+	// Used for global variables
+	Func<int, int> getVariableOffset = (index) => {
+		return (int) (index * 4);
 	};
 	
 	//=============================================================================
 	// Version Detection
 	//=============================================================================
 	vars.enabled = true;
-	int nameOffset = 0x0;
-	int scriptOffset = 0x0;
-	int collectibleOffset = 0x0;
-	int tagsOffset = 0x0;
-	int loadOffset = 0x0;
 	int startOffset = 0x0;
 
-	int startAddr =		0x524206C;
-	int threadAddr =	0x4E9F420;
-	int loadingAddr =	patternReference(3, "0f b6 ?? ?? ?? ?? ?? ?? 88 ?? ?? ?? ?? ?? ?? 89 ?? ?? ?? ?? ?? 66 89 ?? ?? ?? ?? ?? ?? 88");
+	int statBaseAddr 	= 	getAddressFromPattern(16, "?? 8b c3 ff ?? ?? ?? ?? ?? eb ?? 8b d3 ?? 8d 0d ?? ?? ?? ?? e8 ?? ?? ?? ??");
+	int scriptBaseAddr 	= 	getAddressFromPattern(5, "74 ?? ?? 8d 05 ?? ?? ?? ?? ?? 83 3c ?? 01 74 ??");
+	int startAddr 		=	0x524206C;
+	int threadAddr 		=	getAddressFromPattern(9, "?? 53 ?? 83 ec ?? ?? 8b 15 ?? ?? ?? ?? ?? 85 d2 74 ?? 33 c9 ?? 8d 05 ?? ?? ?? ??");
+	int loadingAddr 	=	getAddressFromPattern(3, "0f b6 ?? ?? ?? ?? ?? ?? 88 ?? ?? ?? ?? ?? ?? 89 ?? ?? ?? ?? ?? 66 89 ?? ?? ?? ?? ?? ?? 88");
 
 	// Detect Version
 	//===============
-	// Look for module memory size, and set offsets accordingly
+	// Use executable metadata for detecting specific versions
+	var fvi = modules.First().FileVersionInfo;
+	version = string.Join(".", fvi.FileMajorPart, fvi.FileMinorPart, fvi.FileBuildPart, fvi.FilePrivatePart);
 
-	int moduleSize = modules.First().ModuleMemorySize;
-	switch (moduleSize) {
-		case 95293440:
-		case 95286272:
-			version = "1.0.0.14296";
+	switch (version) {
+		case "1.0.0.14296":
 			break;
-		case 95290368:
-			version = "1.0.0.14388";
-			nameOffset = 0x1000;
-			scriptOffset = 0x3B00;
-			collectibleOffset = 0x3A10;
-			tagsOffset = 0xFF0;
-			loadOffset = 0x350E;
+		case "1.0.0.14388":
 			startOffset = -0x30E9;
 			break;
-		case 95351808:
-			version = "1.0.0.14718";
+		case "1.0.0.14718":
 			startOffset = 0x8ECF;
-			nameOffset = 0xD320;
-			collectibleOffset = 0xF5C0;
-			tagsOffset = 0xFF14;
-			scriptOffset = 0xFE00;
-			loadOffset = 0xF82E;
+			break;
+		default:
+			version = "";
 			break;
 	}
 
@@ -783,7 +783,7 @@ init
 	foreach (var item in vars.missions) {
 		vars.watchers.Add(
 			new MemoryWatcher<int>(
-				new DeepPointer(item.Key+scriptOffset)
+				new DeepPointer(scriptBaseAddr + getVariableOffset(item.Key))
 			) { Name = item.Key.ToString() }
 		);
 
@@ -799,7 +799,7 @@ init
 		foreach (var m in item.Value) {
 			vars.watchers.Add(
 				new MemoryWatcher<int>(
-					new DeepPointer(m.Key+scriptOffset)
+					new DeepPointer(scriptBaseAddr + getVariableOffset(m.Key))
 				) { Name = m.Value }
 			);
 
@@ -808,30 +808,26 @@ init
 	}
 	
 	// Add global variables that aren't missions
-	vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(0x5015A80+scriptOffset)) { Name = "eotl" });
-	vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(0x500F958+scriptOffset)) { Name = "chiliadRace" });
-	vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(0x500F960+scriptOffset)) { Name = "chiliadDone" });
+	vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(scriptBaseAddr + getVariableOffset(9436))) { Name = "eotl" });
+	vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(scriptBaseAddr + getVariableOffset(3218))) { Name = "chiliadRace" });
+	vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(scriptBaseAddr + getVariableOffset(3220))) { Name = "chiliadDone" });
 
 	// This turns to 0 while the load screen is still up, so it's only used for split prevention
 	vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(loadingAddr)) { Name = "loading" });
 
 	// Not sure how this flag acts outside the intro, so it's only used for the start
 	vars.watchers.Add(new MemoryWatcher<byte>(new DeepPointer(startAddr+startOffset)) { Name = "startFlag" });
-	vars.watchers.Add(new StringWatcher(new DeepPointer(threadAddr+nameOffset), 10) { Name = "thread" });
+	vars.watchers.Add(new StringWatcher(new DeepPointer(threadAddr, 0x10), 8) { Name = "thread" });
 
 	// Collectibles
 	//=============
 
 	foreach (var item in vars.collectibles) {
 		var type = item.Key;
-		var addr = item.Value+collectibleOffset;
-		// Tags need a different offset
-		if (type == "Tags") {
-			addr = item.Value+tagsOffset;
-		}
+		var id = item.Value;
 		vars.watchers.Add(
 			new MemoryWatcher<int>(
-				new DeepPointer(addr)
+				new DeepPointer(statBaseAddr + getIntStatOffset(id))
 			) { Name = type }
 		);
 	}
@@ -839,8 +835,8 @@ init
 	// Export Lists
 	//=============
 
-	vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(0x500D810+scriptOffset)) { Name = "exportList" });
-	var exportBaseAddr = 0x500D83C+scriptOffset;
+	vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(scriptBaseAddr + getVariableOffset(1088))) { Name = "exportList" });
+	var exportBaseAddr = scriptBaseAddr + getVariableOffset(1099);
 	for (int i = 0; i < 10; i++)
 	{
 		var address = exportBaseAddr + i*4;
