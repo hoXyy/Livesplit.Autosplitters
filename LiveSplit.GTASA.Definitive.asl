@@ -710,13 +710,21 @@ This may not work for all types of splits.");
 
 init
 {
-	// Used for pattern scans
+	// Used for getting addresses from pattern scans
 	Func<int, string, int> getAddressFromPattern = (patternOffset, patternStr) => {
 		var page = modules.First();
 		var scanner = new SignatureScanner(game, page.BaseAddress, page.ModuleMemorySize);
 		IntPtr offsetPtr = scanner.Scan(new SigScanTarget(patternOffset, patternStr));
 		return (int) (offsetPtr.ToInt64() - page.BaseAddress.ToInt64() + game.ReadValue<int>(offsetPtr) + 0x4);
 	};
+
+	// Used for getting specific values from pattern scans
+	Func<int, string, int> getValueFromPattern = (patternOffset, patternStr) => {
+        var page = modules.First();
+        var scanner = new SignatureScanner(game, page.BaseAddress, page.ModuleMemorySize);
+        IntPtr offsetPtr = scanner.Scan(new SigScanTarget(patternOffset, patternStr));
+        return (int) (game.ReadValue<int>(offsetPtr));
+    };
 
 
 	// Used for integer stats
@@ -733,33 +741,20 @@ init
 	// Version Detection
 	//=============================================================================
 	vars.enabled = true;
-	int startOffset = 0x0;
 
 	int statBaseAddr 	= 	getAddressFromPattern(16, "?? 8b c3 ff ?? ?? ?? ?? ?? eb ?? 8b d3 ?? 8d 0d ?? ?? ?? ?? e8 ?? ?? ?? ??");
 	int scriptBaseAddr 	= 	getAddressFromPattern(5, "74 ?? ?? 8d 05 ?? ?? ?? ?? ?? 83 3c ?? 01 74 ??");
-	int startAddr 		=	0x524206C;
+	int startAddr 		=	getAddressFromPattern(9, "8b 05 ?? ?? ?? ?? ?? 8b ?? ?? ?? ?? ?? 83 f8 08 73 ?? ?? c6 ?? ?? ?? ?? ?? 01");
+	int startOffset		=	getValueFromPattern(21, "8b 05 ?? ?? ?? ?? ?? 8b ?? ?? ?? ?? ?? 83 f8 08 73 ?? ?? c6 ?? ?? ?? ?? ?? 01");
 	int threadAddr 		=	getAddressFromPattern(9, "?? 53 ?? 83 ec ?? ?? 8b 15 ?? ?? ?? ?? ?? 85 d2 74 ?? 33 c9 ?? 8d 05 ?? ?? ?? ??");
 	int loadingAddr 	=	getAddressFromPattern(3, "0f b6 ?? ?? ?? ?? ?? ?? 88 ?? ?? ?? ?? ?? ?? 89 ?? ?? ?? ?? ?? 66 89 ?? ?? ?? ?? ?? ?? 88");
+	int playTimeAddr	=	getAddressFromPattern(2, "8b 15 ?? ?? ?? ?? ?? 85 c9 74 ?? 8b 05 ?? ?? ?? ?? 05 20 bf 02 00");
 
 	// Detect Version
 	//===============
 	// Use executable metadata for detecting specific versions
 	var fvi = modules.First().FileVersionInfo;
 	version = string.Join(".", fvi.FileMajorPart, fvi.FileMinorPart, fvi.FileBuildPart, fvi.FilePrivatePart);
-
-	switch (version) {
-		case "1.0.0.14296":
-			break;
-		case "1.0.0.14388":
-			startOffset = -0x30E9;
-			break;
-		case "1.0.0.14718":
-			startOffset = 0x8ECF;
-			break;
-		default:
-			version = "";
-			break;
-	}
 
 	// Version detected
 	//=================
@@ -816,8 +811,17 @@ init
 	vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(loadingAddr)) { Name = "loading" });
 
 	// Not sure how this flag acts outside the intro, so it's only used for the start
-	vars.watchers.Add(new MemoryWatcher<byte>(new DeepPointer(startAddr+startOffset)) { Name = "startFlag" });
+	vars.watchers.Add(new MemoryWatcher<byte>(new DeepPointer(startAddr, startOffset)) { Name = "startFlag" });
+
 	vars.watchers.Add(new StringWatcher(new DeepPointer(threadAddr, 0x10), 8) { Name = "thread" });
+
+	// Playing time only used for the start/reset, may find some other use later maybe?
+	vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(playTimeAddr)) { Name = "playTime" });
+
+
+	// Times wasted/busted stats, not used currently, could be used for bustedwarp/deathwarp splits later if needed
+	//vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(statBaseAddr + getIntStatOffset(133))) { Name = "timesBusted" });
+	//vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(statBaseAddr + getIntStatOffset(135))) { Name = "timesWasted" });
 
 	// Collectibles
 	//=============
@@ -1117,15 +1121,15 @@ start
 	//=============================================================================
 
 	var startFlag = vars.watchers["startFlag"];
-	var thread = vars.watchers["thread"];
+	var playTime = vars.watchers["playTime"];
 
 	// New Game
 	//=========
 	/*
 	 * startFlag switches to 0 from 1 when the game begins to fade out to the intro cutscene.
-	 * The check for the thread is there just for safety.
+	 * The check for the playing time is there so timer doesn't start/reset when loading a save.
 	 */
-	if (startFlag.Current == 0 && startFlag.Old == 1 && thread.Current == "initil2")
+	if (startFlag.Current == 0 && startFlag.Old == 1 && playTime.Current < 5 * 1000)
 	{
 		if (settings.StartEnabled)
 		{
@@ -1144,13 +1148,13 @@ reset
 	//=============================================================================
 
 	var startFlag = vars.watchers["startFlag"];
-	var thread = vars.watchers["thread"];
+	var playTime = vars.watchers["playTime"];
 
 	/*
 	 * Use same check for reset for the timer to reset and start in the same cycle.
 	 * Only downside is that accidental new game will reset the timer (but who would do that with the way DE menu is laid out?)
 	 */
-	if (startFlag.Current == 0 && startFlag.Old == 1 && thread.Current == "initil2")
+	if (startFlag.Current == 0 && startFlag.Old == 1 && playTime.Current < 5 * 1000)
 	{
 		if (settings.ResetEnabled)
 		{
