@@ -561,12 +561,14 @@ split
 	//=============================================================================
 	// Any% final split
 	//=============================================================================
-	if (vars.memoryWatchers["vance_flag"].Current == -11 && vars.memoryWatchers["sonny_flag"].Current == -11) {
-		if (vars.memoryWatchers["sonny_timer"].Current < vars.memoryWatchers["GameTimer"].Current) {
-			if (!vars.splits.Contains("any_end")) {
-				vars.splits.Add("any_end");
-				vars.DebugOutput("Any% final split");
-				return true;
+	if (settings["any_end"]) {
+		if (vars.memoryWatchers["vance_flag"].Current == -11 && vars.memoryWatchers["sonny_flag"].Current == -11) {
+			if (vars.memoryWatchers["sonny_timer"].Current < vars.memoryWatchers["GameTimer"].Current) {
+				if (!vars.splits.Contains("any_end")) {
+					vars.splits.Add("any_end");
+					vars.DebugOutput("Any% final split");
+					return true;
+				}
 			}
 		}
 	}
