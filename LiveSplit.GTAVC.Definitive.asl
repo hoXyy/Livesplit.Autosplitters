@@ -397,14 +397,16 @@ startup
 
 init
 {
-	// Version detection
-	switch(modules.First().ModuleMemorySize)
+	// Use executable metadata for detecting specific versions
+	var fvi = modules.First().FileVersionInfo;
+	version = string.Join(".", fvi.FileMajorPart, fvi.FileMinorPart, fvi.FileBuildPart, fvi.FilePrivatePart);
+	vars.version = new Version(version);
+
+	switch(version)
 	{
-		case 92110848:
-			version = "1.0.0.14296";
+		case "1.0.0.14296":
 			break;
-		case 92128256:
-			version = "1.0.0.14388";
+		case "1.0.0.14388":
 			vars.nameOffset = 0x5010; 
 			vars.scriptOffset = 0x7400;
 			vars.finishOffset = 0x7400;
@@ -412,8 +414,7 @@ init
 			vars.flagOffset = -0x22074B;
 			vars.timerOffset = 0x6810;
 			break;
-		case 92144640:
-			version = "1.0.0.14718";
+		case "1.0.0.14718":
 			vars.scriptOffset = 0xC780;
 			vars.nameOffset = 0xA360;
 			vars.finishOffset = 0xC774;
@@ -444,6 +445,14 @@ init
 	// Missions
 	foreach (var strand in vars.missions) {
 		foreach (var address in strand.Value) {
+			if (address.Value == "Dirtring" || address.Value == "RC Raider" || address.Value == "RC Baron" || address.Value == "RC Bandit") {
+				// 1.0.0.14718 and up have different offsets for these 4
+				if (vars.version.Revision >= 14718) {
+					vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(address.Key+vars.finishOffset)){ Name = address.Value });
+				} else {
+					vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(address.Key+vars.scriptOffset)){ Name = address.Value });
+				}
+			}
 			vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(address.Key+vars.scriptOffset)){ Name = address.Value });
 		}
 	}
