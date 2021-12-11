@@ -514,8 +514,8 @@ split
 	foreach (var mission in vars.missionsEnd) {
 		if (settings["stadAll"]) {
 			foreach (var stadEvent in vars.stadList) {
-				if (vars.memoryWatchers[stadEvent].Current > vars.memoryWatchers[stadEvent].Old && !vars.split.Contains(stadEvent)) {
-					vars.split.Add(stadEvent);
+				if (vars.memoryWatchers[stadEvent].Current > vars.memoryWatchers[stadEvent].Old && !vars.splits.Contains(stadEvent)) {
+					vars.splits.Add(stadEvent);
 					// add the completed stadium mission to splits list, and increment total counter by 1.
 					vars.stadAllCount = vars.stadAllCount + 1;
 					if (vars.stadAllCount == 3) {
@@ -527,7 +527,7 @@ split
 			}
 		}
 		if (settings[mission]) {
-			if (vars.memoryWatchers[mission].Current == vars.memoryWatchers[mission].Old+1) {
+			if (vars.memoryWatchers[mission].Current > vars.memoryWatchers[mission].Old) {
 				if (!vars.splits.Contains(mission)) {
 					vars.DebugOutput("mission end split: " + mission);
 					vars.splits.Add(mission);
