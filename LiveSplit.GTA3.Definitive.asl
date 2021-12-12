@@ -265,8 +265,10 @@ startup
 	}
 
 	// Add collectible settings
+	settings.CurrentDefaultParent = "collectibles";
 	foreach (var collectible in vars.collectibleAddresses) {
-		settings.Add(collectible.Value, false, collectible.Value, "collectibles");
+		settings.Add(collectible.Value+"All", false, collectible.Value+ " (All Done)");
+		settings.Add(collectible.Value+"Each", false, collectible.Value+ " (Each)");
 	};
 
 	// Any% final split setting
@@ -386,7 +388,7 @@ split
 		if (settings[mission]) {
 			if (vars.memoryWatchers[mission.Replace(" (end)", string.Empty)].Current == vars.memoryWatchers[mission.Replace(" (end)", string.Empty)].Old+1) {
 				if (!vars.splits.Contains(mission)) {
-					vars.DebugOutput("mission end split: " + mission);
+					vars.DebugOutput("Mission End Split: " + mission);
 					vars.splits.Add(mission);
 					return true;
 				}
@@ -402,7 +404,7 @@ split
 			if (vars.memoryWatchers["MissionScript"].Current != vars.memoryWatchers["MissionScript"].Old) {
 				if (vars.memoryWatchers["MissionScript"].Current == script.Key) {
 					if (!vars.splits.Contains(script + " (start)")) {
-						vars.DebugOutput("mission start split: " + script.Value);
+						vars.DebugOutput("Mission Start Split: " + script.Value);
 						vars.splits.Add(script + " (start)");
 						return true;
 					}
@@ -415,11 +417,30 @@ split
 	// Collectibles check
 	//=============================================================================
 	foreach (var collectible in vars.collectibleAddresses) {
-		if (settings[collectible.Value])
-		{
-			if (vars.memoryWatchers[collectible.Value].Current == vars.memoryWatchers[collectible.Value].Old+1) {
-				vars.DebugOutput("collectible split: " + collectible.Value);
-				return true;
+		var cvalue = vars.memoryWatchers[collectible.Value.ToString()];
+		if (cvalue.Current > cvalue.Old) {
+			if (settings[collectible.Value+"All"]) // adjusting the max count for each collectible type based on what we want to split.
+			{
+				int max = 20;
+				if (collectible.Value == "Hidden Packages")	{
+					max = 100;
+				}
+				if (cvalue.Current == max && cvalue.Old == max-1) {
+					var splitName = collectible.Value+" "+cvalue.Current;
+					if (!vars.splits.Contains(splitName)) {
+						vars.DebugOutput("All Collectibles Split: " + splitName);
+						vars.splits.Add(splitName);
+						return true;
+					}
+				}
+			}
+			if (settings[collectible.Value+"Each"]) { // if it's each, add the collectible to splits list and try to split.
+					var splitName = collectible.Value+" "+cvalue.Current;
+					if (!vars.splits.Contains(splitName)) {
+						vars.DebugOutput("Collectible Split: " + splitName);
+						vars.splits.Add(splitName);
+						return true;
+					}				
 			}
 		}
 	}
@@ -431,7 +452,7 @@ split
 		if (vars.memoryWatchers["MissionScript"].Current == "cat1") {
 			if (vars.memoryWatchers["teHelipad"].Current == 1 && vars.memoryWatchers["teTimer"].Current != vars.memoryWatchers["teTimer"].Old) {
 				if (!vars.splits.Contains("any_end")) {
-					vars.DebugOutput("any% final split");
+					vars.DebugOutput("Any% Final Split");
 					vars.splits.Add("any_end");
 					return true;
 				}
