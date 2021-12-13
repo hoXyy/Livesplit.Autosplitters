@@ -394,6 +394,9 @@ startup
 	settings.CurrentDefaultParent = null;
 	settings.Add("any_end", true, "Any% Final Split");
 	settings.SetToolTip("any_end", "Splits once you lose control on \"Keep Your Friends Close\".");
+
+	// Used later to count stadium missions
+	vars.stadAllCount = 0;
 }
 
 init
