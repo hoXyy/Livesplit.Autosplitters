@@ -1,0 +1,1 @@
+This folder houses some ASL scripts that aren't really autosplitters, just utilities I use during some of my runs. If you find something here that interests you, feel free to use it!
