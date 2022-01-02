@@ -22,8 +22,8 @@ startup
 	 * Collectible type acts as setting ID, so don't change it.
 	 */
 	vars.collectibles = new Dictionary<string,int> {
-		{"Photos",	166},
-		{"Tags",	322},
+		{"Photos",	231},
+		{"Tags",	322}, // this isn't actually used, keeping it here for settings purposes
 		{"Oysters",	243},
 		{"Horseshoes", 241},
 		{"Stunts (Completed)", 145}
@@ -729,7 +729,7 @@ init
 
 	// Used for integer stats
 	Func<int, int> getIntStatOffset = (statId) => {
-		return (int) (statId - 82) * 4;
+		return (int) (statId - 120) * 4;
 	};
 
 	// Used for global variables
@@ -749,6 +749,7 @@ init
 	int threadAddr 		=	getAddressFromPattern(9, "?? 53 ?? 83 ec ?? ?? 8b 15 ?? ?? ?? ?? ?? 85 d2 74 ?? 33 c9 ?? 8d 05 ?? ?? ?? ??");
 	int loadingAddr 	=	getAddressFromPattern(3, "0f b6 ?? ?? ?? ?? ?? ?? 88 ?? ?? ?? ?? ?? ?? 89 ?? ?? ?? ?? ?? 66 89 ?? ?? ?? ?? ?? ?? 88");
 	int playTimeAddr	=	getAddressFromPattern(2, "8b 15 ?? ?? ?? ?? ?? 85 c9 74 ?? 8b 05 ?? ?? ?? ?? 05 20 bf 02 00");
+	int tagsAddr 		= 	getAddressFromPattern(2, "8b 3d ?? ?? ?? ?? ?? 8d 15 ?? ?? ?? ?? 8b 1d ?? ?? ?? ?? 66 ?? 89 2d ?? ?? ?? ?? e8");
 
 	// Detect Version
 	//===============
@@ -829,11 +830,22 @@ init
 	foreach (var item in vars.collectibles) {
 		var type = item.Key;
 		var id = item.Value;
-		vars.watchers.Add(
-			new MemoryWatcher<int>(
-				new DeepPointer(statBaseAddr + getIntStatOffset(id))
-			) { Name = type }
-		);
+
+		// Tags require a different address
+		if (item.Key == "Tags") {
+			vars.watchers.Add(
+				new MemoryWatcher<int>(
+					new DeepPointer(tagsAddr)
+				) { Name = type }
+			);			
+		}
+		else {
+			vars.watchers.Add(
+				new MemoryWatcher<int>(
+					new DeepPointer(statBaseAddr + getIntStatOffset(id))
+				) { Name = type }
+			);
+		}
 	}
 
 	// Export Lists
