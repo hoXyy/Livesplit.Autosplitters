@@ -5,6 +5,7 @@
 state("LibertyCity", "1.0.0.14296"){}
 state("LibertyCity", "1.0.0.14377"){}
 state("LibertyCity", "1.0.0.14718"){}
+state("LibertyCity", "1.0.0.15284"){}
 
 startup
 {
@@ -308,6 +309,13 @@ init
 			vars.nameOffset = 0x19BB0;
 			vars.scriptOffset = 0x19B80;
 			vars.loadOffset = 0x19B90;
+			break;
+		case 91710464:
+			version = "1.0.0.15284";
+			vars.startOffset = 0x18F98D;
+			vars.nameOffset = -0x3863A8;
+			vars.loadOffset = -0x36A90C;
+			vars.scriptOffset = -0xCD3D0;
 			break;
 
 	}
