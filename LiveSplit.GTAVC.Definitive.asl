@@ -5,6 +5,7 @@
 state("ViceCity", "1.0.0.14296"){}
 state("ViceCity", "1.0.0.14388"){}
 state("ViceCity", "1.0.0.14718"){}
+state("ViceCity", "1.0.0.15399"){}
 
 startup
 {
@@ -425,6 +426,14 @@ init
 			vars.timerOffset = 0xBB70;
 			vars.flagOffset = -0x46AB23;
 			vars.loadOffset = 0x42F4FC; 
+			break;
+		case "1.0.0.15399":
+			vars.scriptOffset = -0x6520;
+			vars.nameOffset = 0x6220;
+			vars.timerOffset = 0x7A30;
+			vars.loadOffset = 0x42B76C;
+			vars.flagOffset = -0x46EB33;
+			vars.finishOffset = -0x652C; // I don't think this is correct, so TODO: replace this with a correct offset
 			break;
 	}
 

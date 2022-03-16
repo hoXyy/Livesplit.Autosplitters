@@ -290,28 +290,28 @@ startup
 
 init
 {
+	var fvi = modules.First().FileVersionInfo;
+	version = string.Join(".", fvi.FileMajorPart, fvi.FileMinorPart, fvi.FileBuildPart, fvi.FilePrivatePart);
+	vars.version = new Version(version);
+
 	// Version detection
-	switch(modules.First().ModuleMemorySize)
+	switch(version)
 	{
-		case 91697152:
-			version = "1.0.0.14296";
+		case "1.0.0.14296":
 			break; 
-		case 91702272:
-			version = "1.0.0.14377";
+		case "1.0.0.14377":
 			vars.nameOffset = 0x3810;
 			vars.scriptOffset = 0x3800;
 			vars.startOffset = 0x2010;
 			vars.loadOffset = 0x3810;
 			break;
-		case 91804672:
-			version = "1.0.0.14718";
+		case "1.0.0.14718":
 			vars.startOffset = 0x18360;
 			vars.nameOffset = 0x19BB0;
 			vars.scriptOffset = 0x19B80;
 			vars.loadOffset = 0x19B90;
 			break;
-		case 91710464:
-			version = "1.0.0.15284";
+		case "1.0.0.15284":
 			vars.startOffset = 0x18F98D;
 			vars.nameOffset = -0x3863A8;
 			vars.loadOffset = -0x36A90C;
