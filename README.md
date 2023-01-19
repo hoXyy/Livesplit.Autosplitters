@@ -10,6 +10,7 @@ Livesplit Autosplitters I made
 - GTA: Vice City Definitive Edition autosplitter - LiveSplit.GTAVC.Definitive.asl
 - GTA: San Andreas Definitive Edition autosplitter - LiveSplit.GTASA.Definitive.asl
 - Persona 5 Royal Load Remover (currently in testing) - LiveSplit.P5R.asl
+- Persona 3 Portable Load Remover (currently in testing) - LiveSplit.P3P.asl
 
 # Autosplitters I help with:
 - GTA V autosplitter - [GTAV-Auto-Splitter.asl](https://github.com/hoXyy/GTAV-AutoSplitter)
