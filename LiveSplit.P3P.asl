@@ -1,11 +1,11 @@
 state("P3P")
 {
-    short load: 0xA2FCC0;
+    short load: 0x9CF134;
 }
 
 state("p3p_sln_DT_m")
 {
-    short load: 0xEC1DA0;
+    short load: 0x130AF74;
 }
 
 init
@@ -15,7 +15,7 @@ init
 
 isLoading
 {
-    return current.load == 0;
+    return current.load != 1;
 }
 
 exit
