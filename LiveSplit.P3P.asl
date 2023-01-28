@@ -15,7 +15,7 @@ init
 
 isLoading
 {
-    return current.load != 1;
+    return current.load == 4;
 }
 
 exit
