@@ -127,6 +127,7 @@ init
 {
 	vars.offset = -0x10140;
 	vars.split = new List<string>();
+	vars.timerPhase = timer.CurrentPhase;
 	
 	// Adds mission memory addresses (with the correct offset) to the watcher list.
 	vars.memoryWatchers = new MemoryWatcherList();
@@ -138,7 +139,7 @@ init
 		vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(address.Key+vars.offset)) { Name = address.Value });
 	
 	// Add memory address for the "game state" to the watcher list.
-	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(0x505A2C+vars.offset)) { Name = "gameState" });
+	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(0x4F5838)) { Name = "gameState" });
 	
 	// Memory addresses used for the final split of Any% (see below).
 	vars.memoryWatchers.Add(new MemoryWatcher<byte>(new DeepPointer(0x35F6B8+vars.offset)) { Name = "teHelipad" });
@@ -148,7 +149,7 @@ init
 	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(0x50651C+vars.offset)) { Name = "progressMade" });
 	
 	// Memory address used to read mission titles.
-	vars.memoryWatchers.Add(new StringWatcher(new DeepPointer(0x274F20 + vars.offset), 64) { Name = "missionText" });
+	vars.memoryWatchers.Add(new StringWatcher(new DeepPointer(0x264DE2), 64) { Name = "missionText" }); 
 	
 }
 
@@ -157,16 +158,16 @@ update
 	// Disables all the action blocks below in the code if the user is using an unsupported version.
 	if (current.modCheck != "GTA Thrice Files")
 		return false;
-	
+
+	// Reset some variables when the timer is started, so we don't need to rely on the star7t action in this script.
+	if ((vars.timerPhase != timer.CurrentPhase && vars.timerPhase != TimerPhase.Paused) && timer.CurrentPhase == TimerPhase.Running)
+		vars.split.Clear();
+
 	// Stores the curent phase the timer is in, so we can use the old one on the next frame.
-	current.timerPhase = timer.CurrentPhase;
+	vars.timerPhase = timer.CurrentPhase;
 	
 	// Update all of the memory readings for the mission memory addresses.
 	vars.memoryWatchers.UpdateAll(game);
-	
-	// Reset some variables when the timer is started, so we don't need to rely on the start action in this script.
-	if ((old.timerPhase != current.timerPhase && old.timerPhase != TimerPhase.Paused) && current.timerPhase == TimerPhase.Running)
-		vars.split.Clear();
 }
 
 split
@@ -182,7 +183,7 @@ split
 	
 	// Same as above but for mission starts.
 	foreach (var mission in vars.missionStartList) {
-		var missionText = vars.memoryWatchers["missionText"].Current;
+		var missionText = vars.memoryWatchers["missionText"].Current.TrimEnd('\''); 
 		var upperMission = mission.ToUpper();
 		upperMission = upperMission.Replace(" (START)", string.Empty);
 		
