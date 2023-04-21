@@ -159,15 +159,15 @@ update
 	if (current.modCheck != "GTA Thrice Files")
 		return false;
 
-	// Reset some variables when the timer is started, so we don't need to rely on the star7t action in this script.
-	if ((vars.timerPhase != timer.CurrentPhase && vars.timerPhase != TimerPhase.Paused) && timer.CurrentPhase == TimerPhase.Running)
-		vars.split.Clear();
-
 	// Stores the curent phase the timer is in, so we can use the old one on the next frame.
-	vars.timerPhase = timer.CurrentPhase;
+	current.timerPhase = timer.CurrentPhase;
 	
 	// Update all of the memory readings for the mission memory addresses.
 	vars.memoryWatchers.UpdateAll(game);
+	
+	// Reset some variables when the timer is started, so we don't need to rely on the start action in this script.
+	if ((old.timerPhase != current.timerPhase && old.timerPhase != TimerPhase.Paused) && current.timerPhase == TimerPhase.Running)
+		vars.split.Clear();
 }
 
 split
