@@ -149,7 +149,7 @@ init
 	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(0x50651C+vars.offset)) { Name = "progressMade" });
 	
 	// Memory address used to read mission titles.
-	vars.memoryWatchers.Add(new StringWatcher(new DeepPointer(0x264DE2), 64) { Name = "missionText" }); 
+	vars.memoryWatchers.Add(new StringWatcher(new DeepPointer(0x264DE0), 64) { Name = "missionText" }); 
 	
 }
 
@@ -180,13 +180,13 @@ split
 			return true;
 		}
 	}
-	
+
 	// Same as above but for mission starts.
 	foreach (var mission in vars.missionStartList) {
-		var missionText = vars.memoryWatchers["missionText"].Current.TrimEnd('\''); 
+		var missionText = vars.memoryWatchers["missionText"].Current; 
 		var upperMission = mission.ToUpper();
 		upperMission = upperMission.Replace(" (START)", string.Empty);
-		
+
 		if (settings[mission] && !missionText.Equals(vars.memoryWatchers["missionText"].Old) && !vars.split.Contains("s" + upperMission)) {
 			if (missionText.Equals("'" + upperMission + "'")) {
 				vars.split.Add("s" + upperMission);
@@ -194,7 +194,7 @@ split
 			}
 		}
 	}
-	
+
 	// Goes through all collectibles in the list, attempts to not split twice for the same collectible.
 	foreach (var collectible in vars.collectList) {
 		var cvalue = vars.memoryWatchers[collectible];
