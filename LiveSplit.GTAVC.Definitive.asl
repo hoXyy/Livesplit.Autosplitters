@@ -1,4 +1,5 @@
 // GTA Vice City Definitive Edition autosplitter by hoxi
+// Updated for latest version of VCDE by kouty
 // Heavily based on the original GTA III/VC autosplitters
 
 // needed for each version to be actually detected properly
@@ -6,6 +7,7 @@ state("ViceCity", "1.0.0.14296"){}
 state("ViceCity", "1.0.0.14388"){}
 state("ViceCity", "1.0.0.14718"){}
 state("ViceCity", "1.0.0.15399"){}
+state("ViceCity", "1.0.17.39540"){}
 
 startup
 {
@@ -434,6 +436,27 @@ init
 			vars.loadOffset = 0x42B76C;
 			vars.flagOffset = -0x46EB33;
 			vars.finishOffset = -0x652C; // I don't think this is correct, so TODO: replace this with a correct offset
+			break;
+		case "1.0.17.39540":
+			var moduleSize = modules.First().ModuleMemorySize;
+
+			if (moduleSize == 93336576) {
+				vars.DebugOutput("Latest patch RGL");
+				vars.scriptOffset = 0x10F7E0;
+				vars.nameOffset = 0x11B0F0;
+				vars.finishOffset = 0x10F7DC;
+				vars.timerOffset = 0x11CDA0;
+				vars.flagOffset = -0x3599F3;
+				vars.loadOffset = 0x5418AC;
+			} else if (moduleSize == 93344768) {
+				vars.DebugOutput("Latest patch Steam");
+				vars.scriptOffset = 0x1117A0;
+				vars.nameOffset = 0x11D0B0;
+				vars.finishOffset = 0x11179C;
+				vars.timerOffset = 0x11ED60;
+				vars.flagOffset = -0x357A13;
+				vars.loadOffset = 0x54387C;
+			}
 			break;
 	}
 
