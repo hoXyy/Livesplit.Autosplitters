@@ -105,7 +105,7 @@ init
         {
             version = "GOG";
         }
-        else if ((int)modules.First().ModuleMemorySize == 0x31AD000)
+        else if ((int)modules.First().ModuleMemorySize == 0x31AD000 || (int)modules.First().ModuleMemorySize == 0x31582FC)
         {
             version = "Steam";
         }
