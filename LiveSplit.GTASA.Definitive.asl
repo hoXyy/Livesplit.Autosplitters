@@ -16,6 +16,10 @@ startup
 	//=============================================================================
 	// There are more memory addresses defined in `init` in the "Version Detection"
 	// and "Memory Watcher" sections.
+	//
+	// Nothing in here is tied to a specific game version: addresses are found by
+	// pattern scans and the global variable indexes are adjusted to the loaded
+	// main.scm (see "Global Variable Layouts").
 
 	// Collectibles
 	//=============
@@ -28,6 +32,27 @@ startup
 		{"Oysters",	243},
 		{"Horseshoes", 241},
 		{"Stunts (Completed)", 145}
+	};
+
+	// Global Variable Layouts
+	//========================
+	/*
+	 * All global variable indexes in this file are the ones of the original
+	 * release (1.0). A patch that recompiles main.scm can add new global variables,
+	 * which moves every variable behind them, so the indexes are adjusted based on
+	 * which main.scm the game has actually loaded (rather than the game version).
+	 *
+	 * Key: Size of the header + global variables in bytes, as stored in the first
+	 * instruction of main.scm.
+	 * Value: Pairs of "first index" and "amount to add to indexes from there on".
+	 *
+	 * The first index of each pair is just the first variable that was seen with
+	 * that shift, the actual change happens somewhere in the unused gap before it
+	 * (none of the variables used here are anywhere near those gaps).
+	 */
+	vars.scriptLayouts = new Dictionary<int, int[]> {
+		{49492, new int[] {}},					// 1.0, 1.01, 1.03, 1.04, 1.04.5
+		{49536, new int[] {450, 1, 4825, 5, 8729, 6, 9180, 7}},	// 1.112
 	};
 
 	// Missions
@@ -221,8 +246,9 @@ startup
 			{3, "Quarry 3"},
 			{4, "Quarry 4"},
 			{5, "Quarry 5"},
-			{6, "Quarry 6"},
-			{7, "Quarry 7"}
+			{6, "Quarry 6"}
+			// Quarry 7 is in vars.missions2, this counter goes back to 0 in the same
+			// frame it reaches 7, so the 7 can't be seen
 		}}
 	/*
 		{0x64A9C4, new Dictionary<int, string> { // $CURRENT_WANTED_LIST (Export)
@@ -305,10 +331,15 @@ startup
 			{3415, "San Fierro Courier"}, 	// $MISSION_COURIER_SF_PASSED ($1994)
 			{3320, "Valet Parking Complete"}, 	// $1900
 		}},
-		// Races addresses are based on the global variable $RACES_WON ($3661), which
-		// is an array. The number in the comment is the $RACE_INDEX ($353).
-		// 
-		// Missing are races that are already done during story missions:
+		// Not added as settings group (the setting is added with the other Quarry missions)
+		{"Quarry", new Dictionary<int, string> {
+			{2902, "Quarry 7"},	// Quarry complete flag, set together with the counter reset
+		}},
+		// Races addresses are based on the global variable $RACES_WON ($3721), which
+		// is an array indexed by $RACE_INDEX ($353), the number in the comment.
+		//
+		// Missing are races that are already done during story missions (they still
+		// have their own entry in the array):
 		// Lowrider Race (0), Badlands A (7), Badlands B (8)
 		//
 		{"LS Races", new Dictionary<int, string> {
@@ -320,30 +351,30 @@ startup
 			{3727, "Into the Country"},		// 6
 		}},
 		{"SF Races", new Dictionary<int, string> {	
-			{3728, "Dirtbike Danger"},		// 9
-			{3729, "Bandito County"},		// 10
-			{3730, "Go-Go Karting"},		// 11
-			{3731, "San Fierro Fastlane"}, 	// 12
-			{3732, "San Fierro Hills"},		// 13
-			{3733, "Country Endurance"}, 	// 14
+			{3730, "Dirtbike Danger"},		// 9
+			{3731, "Bandito County"},		// 10
+			{3732, "Go-Go Karting"},		// 11
+			{3733, "San Fierro Fastlane"}, 	// 12
+			{3734, "San Fierro Hills"},		// 13
+			{3735, "Country Endurance"}, 	// 14
 		}},
 		{"LV Races", new Dictionary<int, string> {
-			{3734, "SF to LV"},			// 15
-			{3735, "Dam Rider"},		// 16
-			{3736, "Desert Tricks"},		// 17
-			{3737, "LV Ringroad"},		// 18
+			{3736, "SF to LV"},			// 15
+			{3737, "Dam Rider"},		// 16
+			{3738, "Desert Tricks"},		// 17
+			{3739, "LV Ringroad"},		// 18
 		}},
 		{"Air Races", new Dictionary<int, string> {
-			{3738, "World War Ace"},		// 19
-			{3739, "Barnstorming"},		// 20
-			{3740, "Military Service"}, 	// 21
-			{3741, "Chopper Checkpoint"}, 	// 22
-			{3742, "Whirly Bird Waypoint"},	// 23
-			{3743, "Heli Hell"},		// 24
+			{3740, "World War Ace"},		// 19
+			{3741, "Barnstorming"},		// 20
+			{3742, "Military Service"}, 	// 21
+			{3743, "Chopper Checkpoint"}, 	// 22
+			{3744, "Whirly Bird Waypoint"},	// 23
+			{3745, "Heli Hell"},		// 24
 		}},
 		{"Stadium Events", new Dictionary<int, string> {
-			{3744, "8-Track"},			// 25
-			{3745, "Dirt Track"},		// 26
+			{3746, "8-Track"},			// 25
+			{3747, "Dirt Track"},		// 26
 			{91, "Kickstart"}, 		// $MISSION_KICKSTART_PASSED ($90)
 			{3362, "Bloodring"}, 		// $MISSION_BLOODRING_PASSED ($1941)
 		}},
@@ -373,6 +404,9 @@ startup
 	vars.startMissions = new Dictionary<string, string> {
 		{"grove2", "GT #1"},	// Grove 4 Life
 		{"manson5", "GT #2"},	// Cut Throat Business
+		// Normally split by Part 2 being passed (which is right before this starts), this is for
+		// when the chase is started in some other way, where the mission counter doesn't change
+		{"finalec", "End of the Line Part 2"},
 		{"steal", "Wang Cars (Showroom Bought)"},
 		{"planes", "Plane Flight"},
 		{"psch", "Verdant Meadows (Safehouse)"},
@@ -611,6 +645,7 @@ startup
 	addMissionsHeader("Wang Cars", 546, "Wang Cars");
 	addMissionsHeader("Trucking", 9581, "Trucking");
 	addMissionsHeader("Quarry", 9593, "Quarry");
+	settings.Add("Quarry 7", true, "Quarry 7", "QuarryMissions");
 	addMissions2Header("Assets", true, "Other Asset Missions");
 	addMissions2Header("Schools", true, "Schools");
 	settings.Add("Driving School Started", false, "Driving School Started", "Schools");
@@ -711,21 +746,28 @@ This may not work for all types of splits.");
 
 init
 {
-	// Used for getting addresses from pattern scans
+	var baseAddr = modules.First().BaseAddress;
+	var moduleSize = modules.First().ModuleMemorySize;
+
+	// Used for getting addresses from pattern scans, returns 0 if the pattern wasn't found
+	// (which just ends up as a value that never changes, so the splits depending on it won't
+	// do anything)
 	Func<int, string, int> getAddressFromPattern = (patternOffset, patternStr) => {
-		var page = modules.First();
-		var scanner = new SignatureScanner(game, page.BaseAddress, page.ModuleMemorySize);
+		var scanner = new SignatureScanner(game, baseAddr, moduleSize);
 		IntPtr offsetPtr = scanner.Scan(new SigScanTarget(patternOffset, patternStr));
-		return (int) (offsetPtr.ToInt64() - page.BaseAddress.ToInt64() + game.ReadValue<int>(offsetPtr) + 0x4);
+		if (offsetPtr == IntPtr.Zero)
+			return 0;
+		return (int) (offsetPtr.ToInt64() - baseAddr.ToInt64() + game.ReadValue<int>(offsetPtr) + 0x4);
 	};
 
 	// Used for getting specific values from pattern scans
 	Func<int, string, int> getValueFromPattern = (patternOffset, patternStr) => {
-        var page = modules.First();
-        var scanner = new SignatureScanner(game, page.BaseAddress, page.ModuleMemorySize);
-        IntPtr offsetPtr = scanner.Scan(new SigScanTarget(patternOffset, patternStr));
-        return (int) (game.ReadValue<int>(offsetPtr));
-    };
+		var scanner = new SignatureScanner(game, baseAddr, moduleSize);
+		IntPtr offsetPtr = scanner.Scan(new SigScanTarget(patternOffset, patternStr));
+		if (offsetPtr == IntPtr.Zero)
+			return 0;
+		return (int) (game.ReadValue<int>(offsetPtr));
+	};
 
 
 	// Used for integer stats
@@ -733,81 +775,155 @@ init
 		return (int) (statId - 120) * 4;
 	};
 
-	// Used for global variables
-	Func<int, int> getVariableOffset = (index) => {
-		return (int) (index * 4);
-	};
-	
 	//=============================================================================
 	// Version Detection
 	//=============================================================================
+	// There is no list of supported versions, all addresses are found by scanning
+	// for the code that uses them. The patterns are checked against 1.0, 1.01, 1.03,
+	// 1.04, 1.04.5 and 1.112.
 	vars.enabled = true;
 
-	int statBaseAddr 	= 	getAddressFromPattern(16, "?? 8b c3 ff ?? ?? ?? ?? ?? eb ?? 8b d3 ?? 8d 0d ?? ?? ?? ?? e8 ?? ?? ?? ??");
-	int scriptBaseAddr 	= 	getAddressFromPattern(5, "74 ?? ?? 8d 05 ?? ?? ?? ?? ?? 83 3c ?? 01 74 ??");
-	int startAddr 		=	getAddressFromPattern(9, "8b 05 ?? ?? ?? ?? ?? 8b ?? ?? ?? ?? ?? 83 f8 08 73 ?? ?? c6 ?? ?? ?? ?? ?? 01");
+	var addrs = new Dictionary<string, int> {
+		{"stats",	getAddressFromPattern(16, "?? 8b c3 ff ?? ?? ?? ?? ?? eb ?? 8b d3 ?? 8d 0d ?? ?? ?? ?? e8 ?? ?? ?? ??")},
+		{"script",	getAddressFromPattern(5, "74 ?? ?? 8d 05 ?? ?? ?? ?? ?? 83 3c ?? 01 74 ??")},
+		{"start",	getAddressFromPattern(9, "8b 05 ?? ?? ?? ?? ?? 8b ?? ?? ?? ?? ?? 83 f8 08 73 ?? ?? c6 ?? ?? ?? ?? ?? 01")},
+		// Since 1.04 this is inlined into another function, so there is no function prologue to match
+		{"thread",	getAddressFromPattern(3, "?? 8b 15 ?? ?? ?? ?? ?? 85 d2 74 ?? 33 c9 ?? 8d 05 ?? ?? ?? ??")},
+		{"loading",	getAddressFromPattern(3, "0f b6 ?? ?? ?? ?? ?? ?? 88 ?? ?? ?? ?? ?? ?? 89 ?? ?? ?? ?? ?? 66 89 ?? ?? ?? ?? ?? ?? 88")},
+		{"playTime",	getAddressFromPattern(2, "8b 15 ?? ?? ?? ?? ?? 85 c9 74 ?? 8b 05 ?? ?? ?? ?? 05 20 bf 02 00")},
+		{"tags",	getAddressFromPattern(2, "8b 3d ?? ?? ?? ?? ?? 8d 15 ?? ?? ?? ?? 8b 1d ?? ?? ?? ?? 66 ?? 89 ?? ?? ?? ?? ?? e8")},
+	};
+	int statBaseAddr 	= 	addrs["stats"];
+	int scriptBaseAddr 	= 	addrs["script"];
+	int startAddr 		=	addrs["start"];
 	int startOffset		=	getValueFromPattern(21, "8b 05 ?? ?? ?? ?? ?? 8b ?? ?? ?? ?? ?? 83 f8 08 73 ?? ?? c6 ?? ?? ?? ?? ?? 01");
-	int threadAddr 		=	getAddressFromPattern(9, "?? 53 ?? 83 ec ?? ?? 8b 15 ?? ?? ?? ?? ?? 85 d2 74 ?? 33 c9 ?? 8d 05 ?? ?? ?? ??");
-	int loadingAddr 	=	getAddressFromPattern(3, "0f b6 ?? ?? ?? ?? ?? ?? 88 ?? ?? ?? ?? ?? ?? 89 ?? ?? ?? ?? ?? 66 89 ?? ?? ?? ?? ?? ?? 88");
-	int playTimeAddr	=	getAddressFromPattern(2, "8b 15 ?? ?? ?? ?? ?? 85 c9 74 ?? 8b 05 ?? ?? ?? ?? 05 20 bf 02 00");
-	int tagsAddr 		= 	getAddressFromPattern(2, "8b 3d ?? ?? ?? ?? ?? 8d 15 ?? ?? ?? ?? 8b 1d ?? ?? ?? ?? 66 ?? 89 2d ?? ?? ?? ?? e8");
+	int threadAddr 		=	addrs["thread"];
+	int loadingAddr 	=	addrs["loading"];
+	int playTimeAddr	=	addrs["playTime"];
+	int tagsAddr 		= 	addrs["tags"];
 
 	// Detect Version
 	//===============
-	// Use executable metadata for detecting specific versions
+	// Only for display, older versions don't have any version info in the executable (0.0.0.0)
 	var fvi = modules.First().FileVersionInfo;
 	version = string.Join(".", fvi.FileMajorPart, fvi.FileMinorPart, fvi.FileBuildPart, fvi.FilePrivatePart);
 
-	// Version detected
-	//=================
+	foreach (var item in addrs) {
+		if (item.Value == 0) {
+			vars.DebugOutput("Pattern not found: "+item.Key+" (splits depending on it won't work)");
+		}
+	}
 
-	if (version == "")
+	// Pretty much everything depends on the script variables
+	if (scriptBaseAddr == 0)
 	{
-		version = "<unknown>";
 		vars.enabled = false;
 	}
-	
-	
 
 	//=============================================================================
 	// Memory Watcher
 	//=============================================================================
 
-	// Add missions as watched memory values
 	vars.watchers = new MemoryWatcherList();
 
-	// Same address for several different splits
-	foreach (var item in vars.missions) {
-		vars.watchers.Add(
-			new MemoryWatcher<int>(
-				new DeepPointer(scriptBaseAddr + getVariableOffset(item.Key))
-			) { Name = item.Key.ToString() }
-		);
+	// Script Variables
+	//=================
+	// These can only be added once the game has loaded main.scm, because that decides
+	// where the variables are (see vars.scriptLayouts), so this is called from `update`
+	// until it succeeds.
+	vars.scriptReady = false;
 
-		// Check if setting for each mission exists (this will output a message to debug if not,
-		// for development)
-		foreach (var m in item.Value) {
-			if (settings[m.Value]) { }
+	Func<bool> addScriptWatchers = () => {
+		// The game copies the start of main.scm into the script space as is, so if it's
+		// loaded there is a jump over the global variables (02 00 01 <target>) at the start
+		var header = game.ReadBytes(baseAddr + scriptBaseAddr, 7);
+		if (header == null || header[0] != 0x02 || header[1] != 0x00 || header[2] != 0x01) {
+			return false;
 		}
-	}
+		int globalsSize = BitConverter.ToInt32(header, 3);
 
-	// Different address for each split
-	foreach (var item in vars.missions2) {
-		foreach (var m in item.Value) {
+		// Use the closest layout if this main.scm isn't known, which is at least correct
+		// for the variables before whatever was changed
+		int layoutKey = -1;
+		foreach (var item in vars.scriptLayouts) {
+			int key = item.Key;
+			if (layoutKey == -1 || Math.Abs(key - globalsSize) < Math.Abs(layoutKey - globalsSize)) {
+				layoutKey = key;
+			}
+		}
+		int[] layout = vars.scriptLayouts[layoutKey];
+		if (layoutKey == globalsSize) {
+			vars.DebugOutput("main.scm layout: "+globalsSize);
+		}
+		else {
+			vars.DebugOutput("Unknown main.scm layout: "+globalsSize+" (using "+layoutKey+", some splits may not work)");
+		}
+
+		// Used for global variables
+		Func<int, int> getVariableOffset = (index) => {
+			int shift = 0;
+			for (int i = 0; i < layout.Length; i += 2) {
+				if (index >= layout[i]) {
+					shift = layout[i+1];
+				}
+			}
+			return (int) ((index + shift) * 4);
+		};
+
+		// Add missions as watched memory values
+		// Same address for several different splits
+		foreach (var item in vars.missions) {
 			vars.watchers.Add(
 				new MemoryWatcher<int>(
-					new DeepPointer(scriptBaseAddr + getVariableOffset(m.Key))
-				) { Name = m.Value }
+					new DeepPointer(scriptBaseAddr + getVariableOffset(item.Key))
+				) { Name = item.Key.ToString() }
 			);
 
-			if (settings[m.Value]) { }
+			// Check if setting for each mission exists (this will output a message to debug if not,
+			// for development)
+			foreach (var m in item.Value) {
+				if (settings[m.Value]) { }
+			}
 		}
-	}
-	
-	// Add global variables that aren't missions
-	vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(scriptBaseAddr + getVariableOffset(9436))) { Name = "eotl" });
-	vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(scriptBaseAddr + getVariableOffset(3218))) { Name = "chiliadRace" });
-	vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(scriptBaseAddr + getVariableOffset(3220))) { Name = "chiliadDone" });
+
+		// Different address for each split
+		foreach (var item in vars.missions2) {
+			foreach (var m in item.Value) {
+				vars.watchers.Add(
+					new MemoryWatcher<int>(
+						new DeepPointer(scriptBaseAddr + getVariableOffset(m.Key))
+					) { Name = m.Value }
+				);
+
+				if (settings[m.Value]) { }
+			}
+		}
+
+		// Add global variables that aren't missions
+		vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(scriptBaseAddr + getVariableOffset(9436))) { Name = "eotl" });
+		vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(scriptBaseAddr + getVariableOffset(3218))) { Name = "chiliadRace" });
+		vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(scriptBaseAddr + getVariableOffset(3220))) { Name = "chiliadDone" });
+
+		// Export Lists
+		vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(scriptBaseAddr + getVariableOffset(1088))) { Name = "exportList" });
+		var exportBaseAddr = scriptBaseAddr + getVariableOffset(1099);
+		for (int i = 0; i < 10; i++)
+		{
+			var address = exportBaseAddr + i*4;
+			//print(address.ToString("X"));
+			vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(address)) { Name = "export"+i });
+		}
+
+		// The regular update comes right after this, so the new watchers start out with
+		// their current value as old value, the same as all the others
+		vars.watchers.UpdateAll(game);
+		vars.scriptReady = true;
+		return true;
+	};
+	vars.AddScriptWatchers = addScriptWatchers;
+
+	// Other Values
+	//=============
 
 	// This turns to 0 while the load screen is still up, so it's only used for split prevention
 	vars.watchers.Add(new MemoryWatcher<bool>(new DeepPointer(loadingAddr)) { Name = "loading" });
@@ -847,18 +963,6 @@ init
 				) { Name = type }
 			);
 		}
-	}
-
-	// Export Lists
-	//=============
-
-	vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(scriptBaseAddr + getVariableOffset(1088))) { Name = "exportList" });
-	var exportBaseAddr = scriptBaseAddr + getVariableOffset(1099);
-	for (int i = 0; i < 10; i++)
-	{
-		var address = exportBaseAddr + i*4;
-		//print(address.ToString("X"));
-		vars.watchers.Add(new MemoryWatcher<int>(new DeepPointer(address)) { Name = "export"+i });
 	}
 
 	vars.watchers.UpdateAll(game);
@@ -934,6 +1038,10 @@ update
 	if (!vars.enabled)
 		return false;
 
+	// Script variables can only be watched once the game has loaded main.scm
+	if (!vars.scriptReady)
+		vars.AddScriptWatchers();
+
 	// Update always, to prevent splitting after loading (if possible, doesn't seem to be 100% reliable)
 	vars.watchers.UpdateAll(game);
 
@@ -954,6 +1062,9 @@ split
 	//=============================================================================
 	// Split prevention
 	//=============================================================================
+	if (!vars.scriptReady) {
+		return false;
+	}
 	if (vars.watchers["loading"].Current) {
 		vars.DebugOutput("Loading");
 		vars.lastLoad = Environment.TickCount;
@@ -1038,12 +1149,9 @@ split
 	var eotl = vars.watchers["eotl"];
 	if (eotl.Current == 3 && eotl.Old == 2)
 	{
-		// This check is probably not necessary since the variable $8014 seems to be
-		// only used in EotL Part 3, but just to be safe.
-		if (vars.Passed("End of the Line Part 2"))
-		{
-			return vars.TrySplit("any%");
-		}
+		// This variable is only used in EotL Part 3, so there is no need to check if the
+		// missions before it have been passed (which they haven't if they were skipped).
+		return vars.TrySplit("any%");
 	}
 
 	// Starting a certain mission

@@ -1,11 +1,8 @@
 // GTA III Definitive Edition autosplitter by hoxi, initial version by illuminati7777
 // Heavily based on the original GTA III/VC autosplitters
 
-// needed for each version to be actually detected properly
-state("LibertyCity", "1.0.0.14296"){}
-state("LibertyCity", "1.0.0.14377"){}
-state("LibertyCity", "1.0.0.14718"){}
-state("LibertyCity", "1.0.0.15284"){}
+// Generic state definition attaches to any version of LibertyCity.exe
+state("LibertyCity"){}
 
 startup
 {
@@ -233,11 +230,8 @@ startup
 		{0x4E1A2A4, "Rampages"}
 	};
 
-	// Address offsets
-	vars.nameOffset = 0x0;
+	// Offset of the script variable space relative to 1.0 (set in init)
 	vars.scriptOffset = 0x0;
-	vars.startOffset = 0x0;
-	vars.loadOffset = 0x0;
 
 	// Timer phase storage
 	vars.prevPhase = null;
@@ -286,70 +280,185 @@ startup
 	// Split prevention things
 	vars.lastLoad = Environment.TickCount;
 	vars.waiting = false;
+	vars.wasLoading = false;
+
+	// Set in init, false if the addresses couldn't be found
+	vars.ready = false;
 }
 
 init
 {
 	var fvi = modules.First().FileVersionInfo;
 	version = string.Join(".", fvi.FileMajorPart, fvi.FileMinorPart, fvi.FileBuildPart, fvi.FilePrivatePart);
-	vars.version = new Version(version);
-
-	// Version detection
-	switch(version)
+	if (string.IsNullOrEmpty(version) || version == "0.0.0.0")
 	{
-		case "1.0.0.14296":
-			break; 
-		case "1.0.0.14377":
-			vars.nameOffset = 0x3810;
-			vars.scriptOffset = 0x3800;
-			vars.startOffset = 0x2010;
-			vars.loadOffset = 0x3810;
-			break;
-		case "1.0.0.14718":
-			vars.startOffset = 0x18360;
-			vars.nameOffset = 0x19BB0;
-			vars.scriptOffset = 0x19B80;
-			vars.loadOffset = 0x19B90;
-			break;
-		case "1.0.0.15284":
-			vars.startOffset = 0x18F98D;
-			vars.nameOffset = -0x3863A8;
-			vars.loadOffset = -0x36A90C;
-			vars.scriptOffset = -0xCD3D0;
-			break;
+		version = fvi.ProductVersion ?? "";
+	}
+	vars.DebugOutput("Detected executable version: " + (string.IsNullOrEmpty(version) ? "<unknown>" : version));
 
+	var mainModule = modules.First();
+	var scanner = new SignatureScanner(game, mainModule.BaseAddress, mainModule.ModuleMemorySize);
+
+	IntPtr ptrMission = IntPtr.Zero;
+	IntPtr ptrStart = IntPtr.Zero;
+	IntPtr ptrLoading = IntPtr.Zero;
+	IntPtr ptrScript = IntPtr.Zero;
+
+	int missionScriptRVA = 0;
+	int startFlagRVA = 0;
+	int loadingRVA = 0;
+	vars.scriptOffset = 0;
+
+	// 1. ScriptSpace scan (Array of global script variables)
+	// Instruction: lea rdi, [rip + disp32] (inside CRunningScript variable resolution)
+	var targetScript = new SigScanTarget(6, "8b 51 18 48 8d 3d ?? ?? ?? ?? 48 03 d7");
+	ptrScript = scanner.Scan(targetScript);
+	if (ptrScript != IntPtr.Zero)
+	{
+		int scriptSpaceRVA = (int)(ptrScript.ToInt64() - mainModule.BaseAddress.ToInt64() + game.ReadValue<int>(ptrScript) + 4);
+		vars.scriptOffset = scriptSpaceRVA - 0x4E19540;
+		vars.DebugOutput(string.Format("Found ScriptSpace at RVA 0x{0:X} (scriptOffset: 0x{1:X})", scriptSpaceRVA, vars.scriptOffset));
+	}
+	else
+	{
+		vars.DebugOutput("ScriptSpace pattern scan failed!");
+	}
+
+	// 2. MissionScript scan (Current running mission thread name)
+	// Instruction: lea rcx, [rip + disp32] (string copy into thread name buffer)
+	var targetMission = new SigScanTarget(7, "84 c0 75 ?? 48 8d 0d ?? ?? ?? ?? 48 2b cf");
+	ptrMission = scanner.Scan(targetMission);
+	if (ptrMission != IntPtr.Zero)
+	{
+		missionScriptRVA = (int)(ptrMission.ToInt64() - mainModule.BaseAddress.ToInt64() + game.ReadValue<int>(ptrMission) + 4);
+		vars.DebugOutput(string.Format("Found MissionScript at RVA 0x{0:X}", missionScriptRVA));
+	}
+	else
+	{
+		vars.DebugOutput("MissionScript pattern scan failed!");
+	}
+
+	// 3. StartFlag scan (Menu start transition flag)
+	// Instruction: mov byte ptr [rip + disp32], al followed by mov dword ptr [rdi + 0x40], 3
+	// The flag we want is the byte right after the one written here, hence the extra + 1
+	var targetStart = new SigScanTarget(2, "88 05 ?? ?? ?? ?? c7 47 40 03 00 00 00");
+	ptrStart = scanner.Scan(targetStart);
+	if (ptrStart != IntPtr.Zero)
+	{
+		startFlagRVA = (int)(ptrStart.ToInt64() - mainModule.BaseAddress.ToInt64() + game.ReadValue<int>(ptrStart) + 4 + 1);
+		vars.DebugOutput(string.Format("Found startFlag at RVA 0x{0:X}", startFlagRVA));
+	}
+	else
+	{
+		vars.DebugOutput("startFlag pattern scan failed!");
+	}
+
+	// 4. Loading scan (Game loading state boolean)
+	// Function resets loading state after load screen completes
+	var targetLoading = new SigScanTarget(0, "8b 15 ?? ?? ?? ?? e8 ?? ?? ?? ?? 8b 05 ?? ?? ?? ?? 89 05 ?? ?? ?? ?? c6 05 ?? ?? ?? ?? 01");
+	ptrLoading = scanner.Scan(targetLoading);
+	if (ptrLoading != IntPtr.Zero)
+	{
+		byte op = game.ReadValue<byte>(ptrLoading + 30);
+		if (op == 0xC6) // c6 05 [disp32] 00 (earlier builds)
+		{
+			int disp = game.ReadValue<int>(ptrLoading + 32);
+			loadingRVA = (int)((ptrLoading + 37).ToInt64() - mainModule.BaseAddress.ToInt64() + disp);
+		}
+		else if (op == 0x40) // 40 88 3d [disp32] (later Title Updates 1.112+)
+		{
+			int disp = game.ReadValue<int>(ptrLoading + 33);
+			loadingRVA = (int)((ptrLoading + 37).ToInt64() - mainModule.BaseAddress.ToInt64() + disp);
+		}
+
+		if (loadingRVA != 0)
+		{
+			vars.DebugOutput(string.Format("Found loading at RVA 0x{0:X}", loadingRVA));
+		}
+		else
+		{
+			vars.DebugOutput(string.Format("Loading pattern found, but followed by unknown opcode 0x{0:X2}!", op));
+		}
+	}
+	else
+	{
+		vars.DebugOutput("Loading pattern scan failed!");
+	}
+
+	// Every address comes from the pattern scans above, so no per-executable offset table is needed.
+	// If a scan fails (i.e. a future update changed the code), disable the autosplitter instead of reading garbage.
+	vars.ready = ptrScript != IntPtr.Zero && missionScriptRVA != 0 && startFlagRVA != 0 && loadingRVA != 0;
+	if (!vars.ready)
+	{
+		vars.DebugOutput("One or more pattern scans failed for version " + version + ", autosplitter disabled!");
+	}
+
+	// Determine variable offset shifts across game updates (from GTA3SaveInfo.dat analysis)
+	// These only depend on which main.scm the update shipped with, so the version number is enough
+	// and it doesn't matter which store the executable is from
+	int missionShift = 0;
+	int usjShift = 0;
+	int rampageShift = 0;
+	int packageShift = 0;
+	int teTimerShift = 0;
+	int teHelipadShift = 0;
+
+	if (fvi.FileBuildPart >= 112)
+	{
+		// Group 3: 1.112, 1.113+ (FLAG_LUIGIS_REACHED inserted at offset 28 shifts all missions and collectibles)
+		missionShift = 4;
+		usjShift = 4;
+		rampageShift = 8;
+		packageShift = 8;
+		teTimerShift = 4;
+		teHelipadShift = 88;
+		vars.DebugOutput("SaveInfo variable layout: Group 3 (+4 mission shift, etc.)");
+	}
+	else if (fvi.FileBuildPart >= 8 || fvi.FilePrivatePart >= 15284)
+	{
+		// Group 2: 1.04, 1.04.5, Steam, Epic (10 variables inserted at offset 10644 shift helipad)
+		teHelipadShift = 40;
+		vars.DebugOutput("SaveInfo variable layout: Group 2 (+40 helipad shift)");
+	}
+	else
+	{
+		// Group 1: 1.0, 1.01, 1.03 (standard 1.0 offsets)
+		vars.DebugOutput("SaveInfo variable layout: Group 1 (standard 1.0 offsets)");
 	}
 
 	// Add memory watchers
 	vars.memoryWatchers = new MemoryWatcherList();
 
-	vars.memoryWatchers.Add(new StringWatcher(new DeepPointer(0x4F70578+vars.nameOffset), 10){ Name = "MissionScript" });
-
-	// Not sure how this flag acts outside the intro, so it's only used for the start
-	vars.memoryWatchers.Add(new MemoryWatcher<byte>(new DeepPointer(0x4BF2D67+vars.startOffset)) { Name = "startFlag" });
-
-	// Used for split prevention on loads
-	vars.memoryWatchers.Add(new MemoryWatcher<bool>(new DeepPointer(0x4F9D11C+vars.loadOffset)) { Name = "loading" });
+	vars.memoryWatchers.Add(new StringWatcher(new DeepPointer(missionScriptRVA), 10){ Name = "MissionScript" });
+	vars.memoryWatchers.Add(new MemoryWatcher<byte>(new DeepPointer(startFlagRVA)) { Name = "startFlag" });
+	vars.memoryWatchers.Add(new MemoryWatcher<bool>(new DeepPointer(loadingRVA)) { Name = "loading" });
 
 	// Any% final split stuff
-	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(0x4E19C00+vars.scriptOffset)){ Name = "teTimer" });
-	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(0x4E1D93C+vars.scriptOffset)){ Name = "teHelipad" });
+	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(0x4E19C00 + vars.scriptOffset + teTimerShift)){ Name = "teTimer" });
+	vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(0x4E1D93C + vars.scriptOffset + teHelipadShift)){ Name = "teHelipad" });
 
 	// Missions
 	foreach (var strand in vars.missions) {
 		foreach (var address in strand.Value) {
-			vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(address.Key+vars.scriptOffset)){ Name = address.Value });
+			vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(address.Key + vars.scriptOffset + missionShift)){ Name = address.Value });
 		}
 	}
 
 	// Collectibles
 	foreach (var collectible in vars.collectibleAddresses) {
-		vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(collectible.Key+vars.scriptOffset)){ Name = collectible.Value });
+		int colShift = 0;
+		if (collectible.Value == "Hidden Packages") colShift = packageShift;
+		else if (collectible.Value == "Unique Stunt Jumps") colShift = usjShift;
+		else if (collectible.Value == "Rampages") colShift = rampageShift;
+		vars.memoryWatchers.Add(new MemoryWatcher<int>(new DeepPointer(collectible.Key + vars.scriptOffset + colShift)){ Name = collectible.Value });
 	};
 }
 
 update
 {
+	// Disables start, split and reset if init couldn't find the addresses
+	if (!vars.ready) return false;
+
 	vars.memoryWatchers.UpdateAll(game);
 
 	// If timer state changes.
@@ -369,10 +478,15 @@ split
 	// Split prevention
 	//=============================================================================
 	if (vars.memoryWatchers["loading"].Current) {
-		vars.DebugOutput("Loading");
+		if (!vars.wasLoading)
+		{
+			vars.DebugOutput("Loading");
+			vars.wasLoading = true;
+		}
 		vars.lastLoad = Environment.TickCount;
 		return false;
 	}
+	vars.wasLoading = false;
 	if (Environment.TickCount - vars.lastLoad < 500) {
 		// Prevent splitting shortly after loading from a save, since this can
 		// sometimes occur because memory values change
@@ -394,7 +508,8 @@ split
 	//=============================================================================
 	foreach (var mission in vars.missionsEnd) {
 		if (settings[mission]) {
-			if (vars.memoryWatchers[mission.Replace(" (end)", string.Empty)].Current == vars.memoryWatchers[mission.Replace(" (end)", string.Empty)].Old+1) {
+			var flag = vars.memoryWatchers[mission.Replace(" (end)", string.Empty)];
+			if (flag.Current == flag.Old+1) {
 				if (!vars.splits.Contains(mission)) {
 					vars.DebugOutput("Mission End Split: " + mission);
 					vars.splits.Add(mission);
@@ -407,17 +522,14 @@ split
 	//=============================================================================
 	// Missions start check
 	//=============================================================================
-	foreach (var script in vars.scripts) {
-		if (settings[script.Value + " (start)"]) {
-			if (vars.memoryWatchers["MissionScript"].Current != vars.memoryWatchers["MissionScript"].Old) {
-				if (vars.memoryWatchers["MissionScript"].Current == script.Key) {
-					if (!vars.splits.Contains(script + " (start)")) {
-						vars.DebugOutput("Mission Start Split: " + script.Value);
-						vars.splits.Add(script + " (start)");
-						return true;
-					}
-				}
-			}
+	var thread = vars.memoryWatchers["MissionScript"];
+	string threadName = thread.Current;
+	if (threadName != null && thread.Changed && vars.scripts.ContainsKey(threadName)) {
+		string startName = vars.scripts[threadName] + " (start)";
+		if (settings[startName] && !vars.splits.Contains(startName)) {
+			vars.DebugOutput("Mission Start Split: " + startName);
+			vars.splits.Add(startName);
+			return true;
 		}
 	}
 
@@ -457,7 +569,7 @@ split
 	// Any% final split
 	//=============================================================================
 	if (settings["any_end"]) {
-		if (vars.memoryWatchers["MissionScript"].Current == "cat1") {
+		if (threadName == "cat1") {
 			if (vars.memoryWatchers["teHelipad"].Current == 1 && vars.memoryWatchers["teTimer"].Current != vars.memoryWatchers["teTimer"].Old) {
 				if (!vars.splits.Contains("any_end")) {
 					vars.DebugOutput("Any% Final Split");
